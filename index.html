@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empire AI Studio</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0b0b0f;
+      color: white;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 20px;
+      text-align: center;
+      background: #15151d;
+      border-bottom: 2px solid #d4af37;
+    }
+
+    header h1 {
+      color: #d4af37;
+      font-size: 30px;
+    }
+
+    header p {
+      color: #cfcfcf;
+      margin-top: 8px;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 25px 18px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 35px 10px;
+    }
+
+    .hero h2 {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      color: #bdbdc5;
+      line-height: 1.6;
+    }
+
+    .button {
+      margin-top: 22px;
+      padding: 15px 25px;
+      border: none;
+      border-radius: 12px;
+      background: #d4af37;
+      color: black;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .card {
+      background: #171720;
+      border: 1px solid #30303b;
+      border-radius: 16px;
+      padding: 22px;
+      text-align: center;
+    }
+
+    .card h3 {
+      color: #d4af37;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: #bdbdc5;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    #project {
+      display: none;
+      margin-top: 30px;
+      background: #171720;
+      padding: 22px;
+      border-radius: 16px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 16px;
+      padding: 13px;
+      border-radius: 10px;
+      border: 1px solid #444451;
+      background: #0d0d13;
+      color: white;
+    }
+
+    textarea {
+      height: 130px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>👑 Empire AI Studio</h1>
+  <p>Create • Edit • Sync • Publish</p>
+</header>
+
+<main>
+
+  <section class="hero">
+    <h2>Create Amazing AI Videos</h2>
+
+    <p>
+      Script, AI Voice, Media, Captions aur Auto Editing —
+      sab aik hi studio mein.
+    </p>
+
+    <button class="button" onclick="openProject()">
+      + Create New Project
+    </button>
+  </section>
+
+  <section class="tools">
+
+    <div class="card">
+      <h3>✍️ AI Script</h3>
+      <p>Topic se video script tayyar karein.</p>
+    </div>
+
+    <div class="card">
+      <h3>🎙️ AI Voice</h3>
+      <p>Script ko AI voice-over mein badlein.</p>
+    </div>
+
+    <div class="card">
+      <h3>🎬 Auto Edit</h3>
+      <p>Photos aur clips ko automatically sync karein.</p>
+    </div>
+
+    <div class="card">
+      <h3>💬 AI Captions</h3>
+      <p>Video ke liye automatic subtitles.</p>
+    </div>
+
+  </section>
+
+  <section id="project">
+
+    <h2>New Video Project</h2>
+
+    <input
+      type="text"
+      placeholder="Project name"
+    >
+
+    <select>
+      <option>YouTube Short — 9:16</option>
+      <option>YouTube Video — 16:9</option>
+      <option>Instagram Reel — 9:16</option>
+      <option>Custom Video</option>
+    </select>
+
+    <textarea
+      placeholder="Apna topic ya script yahan likhein..."
+    ></textarea>
+
+    <button class="button" onclick="startProject()">
+      Start AI Project
+    </button>
+
+    <p id="message" style="margin-top:15px;color:#d4af37;"></p>
+
+  </section>
+
+</main>
+
+<footer>
+  © 2026 Empire AI Studio
+</footer>
+
+<script>
+  function openProject() {
+    document.getElementById("project").style.display = "block";
+
+    document.getElementById("project")
+      .scrollIntoView({
+        behavior: "smooth"
+      });
+  }
+
+  function startProject() {
+    document.getElementById("message").innerText =
+      "Project created! AI features will be added in the next version.";
+  }
+</script>
+
+</body>
+</html>
