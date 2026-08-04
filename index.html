@@ -195,13 +195,18 @@
     © 2026 Empire AI Studio
   </footer>
 
-  <script>
-    function openProject() {
-      document.getElementById("projectBox").style.display = "block";
-      document.getElementById("projectBox")
-        .scrollIntoView({ behavior: "smooth" });
-    }
+  <script> 
+function openProject() {
+  const projectBox = document.getElementById("projectBox");
 
+  if (projectBox) {
+    projectBox.style.display = "block";
+    projectBox.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  }
+    }
     function startProject() {
       const name =
         document.getElementById("projectName").value.trim();
