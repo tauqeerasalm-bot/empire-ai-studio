@@ -230,7 +230,15 @@ if (name === "" || script === "") {
 
 message.innerHTML =
   "Project <b>" + name + "</b> successfully create ho gaya!";
-}
+document.getElementById("resultCard").style.display = "block";
+document.getElementById("resultName").innerHTML =
+  "<b>Project:</b> " + name;
+document.getElementById("resultType").innerHTML =
+  "<b>Video Type:</b> " +
+  document.getElementById("videoType").value;
+document.getElementById("resultScript").innerHTML =
+  "<b>Script:</b> " + script;
+    }
 </script>
 </body>
 </html>
