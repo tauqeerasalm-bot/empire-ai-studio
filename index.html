@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Empire AI Studio</title>
 
   <style>
@@ -20,26 +21,27 @@
     }
 
     header {
-      padding: 20px;
+      padding: 25px 15px;
       text-align: center;
       background: #15151d;
-      border-bottom: 2px solid #d4af37;
+      border-bottom: 3px solid #d4af37;
     }
 
     header h1 {
       color: #d4af37;
-      font-size: 30px;
+      font-size: 32px;
     }
 
     header p {
-      color: #cfcfcf;
-      margin-top: 8px;
+      color: #d0d0d0;
+      margin-top: 10px;
+      font-size: 18px;
     }
 
     main {
       max-width: 900px;
       margin: auto;
-      padding: 25px 18px;
+      padding: 30px 18px;
     }
 
     .hero {
@@ -48,179 +50,168 @@
     }
 
     .hero h2 {
-      font-size: 32px;
-      margin-bottom: 12px;
+      font-size: 42px;
+      line-height: 1.2;
+      margin-bottom: 20px;
     }
 
     .hero p {
-      color: #bdbdc5;
-      line-height: 1.6;
+      color: #cfcfd4;
+      font-size: 20px;
+      line-height: 1.7;
+      margin-bottom: 28px;
     }
 
-    .button {
-      margin-top: 22px;
-      padding: 15px 25px;
-      border: none;
-      border-radius: 12px;
+    .btn {
+      display: inline-block;
       background: #d4af37;
-      color: black;
-      font-size: 17px;
+      color: #111;
+      padding: 18px 28px;
+      border-radius: 14px;
+      font-size: 20px;
       font-weight: bold;
+      text-decoration: none;
       cursor: pointer;
+      border: none;
     }
 
-    .tools {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 15px;
-      margin-top: 25px;
-    }
-
-    .card {
-      background: #171720;
-      border: 1px solid #30303b;
-      border-radius: 16px;
-      padding: 22px;
-      text-align: center;
-    }
-
-    .card h3 {
-      color: #d4af37;
-      margin-bottom: 10px;
-    }
-
-    .card p {
-      color: #bdbdc5;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    #project {
+    .project-box {
       display: none;
-      margin-top: 30px;
+      max-width: 650px;
+      margin: 25px auto;
+      padding: 25px;
       background: #171720;
-      padding: 22px;
-      border-radius: 16px;
+      border: 1px solid #333340;
+      border-radius: 20px;
     }
 
-    input, textarea, select {
+    .project-box h3 {
+      font-size: 30px;
+      margin-bottom: 20px;
+    }
+
+    input,
+    select,
+    textarea {
       width: 100%;
-      margin-top: 10px;
-      margin-bottom: 16px;
-      padding: 13px;
-      border-radius: 10px;
-      border: 1px solid #444451;
-      background: #0d0d13;
+      margin-bottom: 18px;
+      padding: 17px;
+      border-radius: 12px;
+      border: 1px solid #444452;
+      background: #0e0e14;
       color: white;
+      font-size: 17px;
     }
 
     textarea {
-      height: 130px;
+      min-height: 170px;
+      resize: vertical;
+    }
+
+    .message {
+      margin-top: 20px;
+      color: #d4af37;
+      font-size: 19px;
+      line-height: 1.5;
     }
 
     footer {
       text-align: center;
-      padding: 25px;
-      color: #777;
+      color: #999;
+      padding: 25px 15px;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 28px;
+      }
+
+      .hero h2 {
+        font-size: 35px;
+      }
+
+      .hero p {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-<header>
-  <h1>👑 Empire AI Studio</h1>
-  <p>Create • Edit • Sync • Publish</p>
-</header>
+  <header>
+    <h1>👑 Empire AI Studio</h1>
+    <p>Create • Edit • Sync • Publish</p>
+  </header>
 
-<main>
+  <main>
 
-  <section class="hero">
-    <h2>Create Amazing AI Videos</h2>
+    <section class="hero">
+      <h2>Create Amazing AI Videos</h2>
 
-    <p>
-      Script, AI Voice, Media, Captions aur Auto Editing —
-      sab aik hi studio mein.
-    </p>
+      <p>
+        Script, AI Voice, Media, Captions aur Auto Editing —
+        sab aik hi studio mein.
+      </p>
 
-    <button class="button" onclick="openProject()">
-      + Create New Project
-    </button>
-  </section>
+      <button class="btn" onclick="openProject()">
+        + Create New Project
+      </button>
+    </section>
 
-  <section class="tools">
+    <section class="project-box" id="projectBox">
 
-    <div class="card">
-      <h3>✍️ AI Script</h3>
-      <p>Topic se video script tayyar karein.</p>
-    </div>
+      <h3>New Video Project</h3>
 
-    <div class="card">
-      <h3>🎙️ AI Voice</h3>
-      <p>Script ko AI voice-over mein badlein.</p>
-    </div>
+      <input
+        type="text"
+        id="projectName"
+        placeholder="Project name"
+      >
 
-    <div class="card">
-      <h3>🎬 Auto Edit</h3>
-      <p>Photos aur clips ko automatically sync karein.</p>
-    </div>
+      <select id="videoType">
+        <option>YouTube Short — 9:16</option>
+        <option>YouTube Video — 16:9</option>
+        <option>Instagram Reel — 9:16</option>
+        <option>Facebook Video — 9:16</option>
+      </select>
 
-    <div class="card">
-      <h3>💬 AI Captions</h3>
-      <p>Video ke liye automatic subtitles.</p>
-    </div>
+      <textarea
+        id="script"
+        placeholder="Apna topic ya script yahan likhein..."
+      ></textarea>
 
-  </section>
+      <button class="btn" onclick="startProject()">
+        Start AI Project
+      </button>
 
-  <section id="project">
+      <p class="message" id="message"></p>
 
-    <h2>New Video Project</h2>
+    </section>
 
-    <input
-      type="text"
-      placeholder="Project name"
-    >
+  </main>
 
-    <select>
-      <option>YouTube Short — 9:16</option>
-      <option>YouTube Video — 16:9</option>
-      <option>Instagram Reel — 9:16</option>
-      <option>Custom Video</option>
-    </select>
+  <footer>
+    © 2026 Empire AI Studio
+  </footer>
 
-    <textarea
-      placeholder="Apna topic ya script yahan likhein..."
-    ></textarea>
+  <script>
+    function openProject() {
+      document.getElementById("projectBox").style.display = "block";
+      document.getElementById("projectBox")
+        .scrollIntoView({ behavior: "smooth" });
+    }
 
-    <button class="button" onclick="startProject()">
-      Start AI Project
-    </button>
+    function startProject() {
+      const name =
+        document.getElementById("projectName").value.trim();
 
-    <p id="message" style="margin-top:15px;color:#d4af37;"></p>
+      const script =
+        document.getElementById("script").value.trim();
 
-  </section>
+      const message =
+        document.getElementById("message");
 
-</main>
-
-<footer>
-  © 2026 Empire AI Studio
-</footer>
-
-<script>
-  function openProject() {
-    document.getElementById("project").style.display = "block";
-
-    document.getElementById("project")
-      .scrollIntoView({
-        behavior: "smooth"
-      });
-  }
-
-  function startProject() {
-    document.getElementById("message").innerText =
-      "Project created! AI features will be added in the next version.";
-  }
-</script>
-
-</body>
-</html>
+      if (name === "" || script === "") {
+        message.innerHTML =
+          "Please project name aur script dono likhein.";
