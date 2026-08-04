@@ -207,7 +207,7 @@ function openProject() {
     });
   }
 }
-    }
+    
     function startProject() {
       const name =
         document.getElementById("projectName").value.trim();
@@ -218,6 +218,14 @@ function openProject() {
       const message =
         document.getElementById("message");
 
-      if (name === "" || script === "") {
-        message.innerHTML =
-          "Please project name aur script dono likhein.";
+if (name === "" || script === "") {
+  message.innerHTML = "Please project name aur script dono likhein.";
+  return;
+}
+
+message.innerHTML =
+  "Project <b>" + name + "</b> successfully create ho gaya!";
+}
+</script>
+</body>
+</html>
