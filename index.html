@@ -241,7 +241,52 @@ document.getElementById("resultScript").innerHTML =
   "<b>Script:</b> " + script;
     }
     function generateVideo() {
-  alert("AI video generation start ho gayi! Video ready hone par yahan preview show hoga.");
+  const apiKey =
+    "57014972-7719d38442b46933e82be36dd";
+
+  const query = document.getElementById("script").value.trim();
+
+  if (!query) {
+    document.getElementById("message").innerHTML =
+      "Pehle script ya keyword likho.";
+    return;
+  }
+
+  document.getElementById("message").innerHTML =
+    "Video search ho rahi hai...";
+
+  fetch(
+    `https://pixabay.com/api/videos/?key=${apiKey}&q=${encodeURIComponent(query)}&per_page=3`
+  )
+    .then(response => response.json())
+    .then(data => {
+      if (!data.hits || data.hits.length === 0) {
+        document.getElementById("message").innerHTML =
+          "Koi matching video nahi mili.";
+        return;
+      }
+
+      const videoUrl = data.hits[0].videos.medium.url;
+
+      document.getElementById("resultCard").style.display = "block";
+
+      document.getElementById("resultScript").innerHTML = `
+        <video controls style="width:100%; max-height:400px; border-radius:12px;">
+          <source src="${videoUrl}" type="video/mp4">
+          Aapka browser video support nahi karta.
+        </video>
+      `;
+
+      document.getElementById("message").innerHTML =
+        "Video mil gayi!";
+    })
+    .catch(error => {
+      console.error(error);
+
+      document.getElementById("message").innerHTML =
+        "Video load nahi hui. API key ya internet check karo.";
+    });
+    }");
 }
 </script>
 </body>
