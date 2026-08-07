@@ -1,354 +1,337 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Empire AI Studio</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Greeting Instant AI</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        body {
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
+        /* Header */
+        header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        .menu-icon { font-size: 24px; cursor: pointer; color: #333; }
+        .title-group {
+            text-align: center;
+            flex-grow: 1;
+        }
+        .title-group h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+        .title-group .subtitle {
+            font-size: 14px;
+            color: #3b82f6;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .add-icon { font-size: 24px; cursor: pointer; }
 
-    body {
-      background: #0b0b0f;
-      color: white;
-      min-height: 100vh;
-    }
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 20px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 15px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .message.user {
+            align-self: flex-end;
+            background-color: #3b82f6;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.ai {
+            align-self: flex-start;
+            background-color: #f1f5f9;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
 
-    header {
-      padding: 25px 15px;
-      text-align: center;
-      background: #15151d;
-      border-bottom: 3px solid #d4af37;
-    }
+        /* Input Area */
+        .input-area {
+            padding: 0 15px 10px 15px;
+            background: white;
+            border-top: 1px solid #f0f0f0;
+        }
+        .input-wrapper {
+            background: white;
+            border: 1px solid #e4e4e7;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+        .input-wrapper textarea {
+            width: 100%;
+            border: none;
+            outline: none;
+            resize: none;
+            font-size: 16px;
+            min-height: 24px;
+            max-height: 100px;
+            background: transparent;
+            color: #333;
+            font-family: inherit;
+        }
+        .input-wrapper textarea::placeholder {
+            color: #a1a1aa;
+        }
 
-    header h1 {
-      color: #d4af37;
-      font-size: 32px;
-    }
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 8px 0 10px 0;
+        }
+        .button-group button {
+            cursor: pointer;
+            border: 1px solid #e4e4e7;
+            background: white;
+            transition: all 0.2s;
+            color: #333;
+        }
+        .button-group button:active {
+            transform: scale(0.96);
+            background: #f9fafb;
+        }
+        .pill-btn {
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .pill-btn.search-btn {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+        }
+        .icon-btn {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .mic-btn {
+            border: 1px solid #e4e4e7;
+        }
+        .mic-btn.listening {
+            background: #fee2e2 !important;
+            border-color: #fca5a5 !important;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
 
-    header p {
-      color: #d0d0d0;
-      margin-top: 10px;
-      font-size: 18px;
-    }
-
-    main {
-      max-width: 900px;
-      margin: auto;
-      padding: 30px 18px;
-    }
-
-    .hero {
-      text-align: center;
-      padding: 35px 10px;
-    }
-
-    .hero h2 {
-      font-size: 42px;
-      line-height: 1.2;
-      margin-bottom: 20px;
-    }
-
-    .hero p {
-      color: #cfcfd4;
-      font-size: 20px;
-      line-height: 1.7;
-      margin-bottom: 28px;
-    }
-
-    .btn {
-      display: inline-block;
-      background: #d4af37;
-      color: #111;
-      padding: 18px 28px;
-      border-radius: 14px;
-      font-size: 20px;
-      font-weight: bold;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      margin: 5px;
-    }
-
-    .btn-secondary {
-      background: #444;
-      color: white;
-    }
-
-    .btn-danger {
-      background: #8b0000;
-      color: white;
-    }
-
-    .project-box {
-      display: none;
-      max-width: 650px;
-      margin: 25px auto;
-      padding: 25px;
-      background: #171720;
-      border: 1px solid #333340;
-      border-radius: 20px;
-    }
-
-    .project-box h3 {
-      font-size: 30px;
-      margin-bottom: 20px;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      margin-bottom: 18px;
-      padding: 17px;
-      border-radius: 12px;
-      border: 1px solid #444452;
-      background: #0e0e14;
-      color: white;
-      font-size: 17px;
-    }
-
-    textarea {
-      min-height: 170px;
-      resize: vertical;
-    }
-
-    .message {
-      margin-top: 20px;
-      color: #d4af37;
-      font-size: 19px;
-      line-height: 1.5;
-    }
-
-    .button-group {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin: 15px 0;
-    }
-
-    footer {
-      text-align: center;
-      color: #999;
-      padding: 25px 15px;
-    }
-
-    #captionsOverlay {
-      background: rgba(0,0,0,0.8);
-      color: #d4af37;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 10px;
-      border-left: 4px solid #d4af37;
-      display: none;
-    }
-
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 28px;
-      }
-      .hero h2 {
-        font-size: 35px;
-      }
-      .hero p {
-        font-size: 18px;
-      }
-      .button-group .btn {
-        width: 100%;
-      }
-    }
-  </style>
+        footer {
+            text-align: center;
+            color: #999;
+            padding: 10px 15px 20px 15px;
+            font-size: 12px;
+            background: white;
+        }
+    </style>
 </head>
 <body>
 
-  <header>
-    <h1>👑 Empire AI Studio</h1>
-    <p>Create • Edit • Sync • Publish</p>
-  </header>
+<div class="app-container">
+    <header>
+        <div class="menu-icon">☰</div>
+        <div class="title-group">
+            <h1>Greeting</h1>
+            <span class="subtitle">⚡ Instant</span>
+        </div>
+        <div class="add-icon">+</div>
+    </header>
 
-  <main>
-    <section class="hero">
-      <h2>Create Amazing AI Videos</h2>
-      <p>Script, AI Voice, Media, Captions aur Auto Editing — sab aik hi studio mein.</p>
-      <button class="btn" onclick="openProject()">+ Create New Project</button>
-    </section>
+    <div class="chat-area" id="chatArea">
+        <!-- Messages will appear here -->
+    </div>
 
-    <section class="project-box" id="projectBox">
-      <h3>New Video Project</h3>
+    <div class="input-area">
+        <div class="input-wrapper">
+            <textarea id="userInput" rows="1" placeholder="Type a message or hold to speak"></textarea>
+        </div>
 
-      <input type="text" id="projectName" placeholder="Project name">
-      
-      <select id="videoType">
-        <option>YouTube Short — 9:16</option>
-        <option>YouTube Video — 16:9</option>
-        <option>Instagram Reel — 9:16</option>
-        <option>Facebook Video — 9:16</option>
-      </select>
+        <div class="button-group">
+            <button class="pill-btn think-btn" id="thinkBtn">⚛️ Think</button>
+            <button class="pill-btn search-btn">🌐 Search</button>
+            <button class="icon-btn add-btn">+</button>
+            <button class="icon-btn mic-btn" id="micBtn">🎤</button>
+        </div>
+    </div>
 
-      <textarea id="script" placeholder="Apna topic ya script yahan likhein... (Example: A robot walking on Mars)"></textarea>
+    <footer>
+        <p>© 2026 Empire AI Studio</p>
+    </footer>
+</div>
 
-      <!-- 🔥 NAYE BUTTONS: Voice aur Captions -->
-      <div class="button-group">
-        <button class="btn btn-secondary" onclick="speakScript()">🔊 Listen with AI Voice (UK)</button>
-        <button class="btn btn-secondary" onclick="showCaptions()">📝 Generate Captions</button>
-      </div>
+<script>
+    const chatArea = document.getElementById('chatArea');
+    const userInput = document.getElementById('userInput');
+    const thinkBtn = document.getElementById('thinkBtn');
+    const micBtn = document.getElementById('micBtn');
 
-      <button class="btn" onclick="startProject()">✅ Start AI Project</button>
-      <p class="message" id="message"></p>
+    // --- 1. Message Send & UI Logic ---
+    function addMessage(sender, text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${sender}`;
+        msgDiv.textContent = text;
+        chatArea.appendChild(msgDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+    }
 
-      <div id="resultCard" style="display:none; margin-top:25px; padding:20px; border:1px solid #d4af37; border-radius:15px;">
-        <h3>🎬 AI Video Project Ready</h3>
-        <p id="resultName"></p>
-        <p id="resultType"></p>
-        <div id="resultScript"></div>
+    function handleSend() {
+        const text = userInput.value.trim();
+        if (!text) return;
         
-        <!-- Captions yahan show hongay -->
-        <div id="captionsOverlay"></div>
-        
-        <button class="btn" onclick="generateVideo()" style="margin-top:15px;">🚀 Generate AI Video (Real)</button>
-        <button class="btn btn-secondary" onclick="clearAll()" style="margin-top:15px;">🗑️ Clear All</button>
-      </div>
-    </section>
-  </main>
+        addMessage('user', text);
+        userInput.value = '';
+        userInput.style.height = 'auto'; // Reset height
 
-  <footer>© 2026 Empire AI Studio</footer>
-
-  <script>
-    // ==========================================
-    // STEP 1: UI CONTROL FUNCTIONS
-    // ==========================================
-    function openProject() {
-      const projectBox = document.getElementById("projectBox");
-      projectBox.style.display = "block";
-      projectBox.scrollIntoView({ behavior: "smooth", block: "start" });
+        // Simulated AI Reply (since we don't have the backend)
+        setTimeout(() => {
+            if(text.toLowerCase().includes('hello')) {
+                addMessage('ai', 'Hello! How can I assist you today?');
+            } else {
+                addMessage('ai', 'I received your message. I am still learning, but ask me anything!');
+            }
+        }, 800);
     }
 
-    function startProject() {
-      const name = document.getElementById("projectName").value.trim();
-      const script = document.getElementById("script").value.trim();
-      const message = document.getElementById("message");
+    // Send on Enter key (Shift+Enter for new line)
+    userInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    });
 
-      if (name === "" || script === "") {
-        message.innerHTML = "⚠️ Please project name aur script dono likhein.";
-        return;
-      }
+    thinkBtn.addEventListener('click', handleSend);
 
-      message.innerHTML = "✅ Project <b>" + name + "</b> successfully create ho gaya!";
-      document.getElementById("resultCard").style.display = "block";
-      document.getElementById("resultName").innerHTML = "<b>📁 Project:</b> " + name;
-      document.getElementById("resultType").innerHTML = "<b>📐 Video Type:</b> " + document.getElementById("videoType").value;
-      document.getElementById("resultScript").innerHTML = "<b>📜 Script:</b> " + script;
-      
-      // Captions aur video area reset karein
-      document.getElementById("captionsOverlay").style.display = "none";
-    }
+    // Auto-resize textarea
+    userInput.addEventListener('input', () => {
+        userInput.style.height = 'auto';
+        userInput.style.height = userInput.scrollHeight + 'px';
+    });
 
-    function clearAll() {
-      document.getElementById("projectName").value = "";
-      document.getElementById("script").value = "";
-      document.getElementById("resultCard").style.display = "none";
-      document.getElementById("message").innerHTML = "";
-      window.speechSynthesis.cancel(); // Voice band karein
-    }
+    // --- 2. Voice to Text (Replace purana speakScript) ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
 
-    // ==========================================
-    // STEP 2: 🔥 AI VOICE (UK ACCENT - FREE)
-    // ==========================================
-    function speakScript() {
-      const scriptText = document.getElementById("script").value.trim();
-      const message = document.getElementById("message");
-      
-      if (!scriptText) {
-        message.innerHTML = "⚠️ Pehle script likho!";
-        return;
-      }
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
 
-      // Agar awaz chal rahi hai toh rok dein
-      window.speechSynthesis.cancel();
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            userInput.value += (userInput.value.length > 0 ? ' ' : '') + transcript;
+            // Auto resize textarea
+            userInput.style.height = 'auto';
+            userInput.style.height = userInput.scrollHeight + 'px';
+        };
 
-      const utterance = new SpeechSynthesisUtterance(scriptText);
-      utterance.lang = 'en-GB'; // UK accent
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      window.speechSynthesis.speak(utterance);
-      
-      message.innerHTML = "🎙️ UK AI Voice play ho rahi hai... (Browser ki built-in speech)";
-    }
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error', event.error);
+            micBtn.classList.remove('listening');
+            isListening = false;
+        };
 
-    // ==========================================
-    // STEP 3: 🔥 AUTO CAPTIONS (SUBTITLES)
-    // ==========================================
-    function showCaptions() {
-      const script = document.getElementById("script").value.trim();
-      const message = document.getElementById("message");
-      const captionsDiv = document.getElementById("captionsOverlay");
+        recognition.onend = () => {
+            micBtn.classList.remove('listening');
+            isListening = false;
+        };
 
-      if (!script) {
-        message.innerHTML = "⚠️ Pehle script likho!";
-        return;
-      }
-
-      // Captions div ko show karein aur text daalein
-      captionsDiv.style.display = "block";
-      captionsDiv.innerText = "📝 " + script;
-      document.getElementById("resultCard").style.display = "block";
-      
-      message.innerHTML = "✅ Captions generate ho gaye!";
-    }
-
-    // ==========================================
-    // STEP 4: 🔥 REAL AI VIDEO GENERATOR
-    // ==========================================
-    async function generateVideo() {
-      const script = document.getElementById("script").value.trim();
-      const message = document.getElementById("message");
-      const resultScript = document.getElementById("resultScript");
-
-      if (!script) {
-        message.innerHTML = "⚠️ Pehle script likho!";
-        return;
-      }
-
-      // Loading state
-      message.innerHTML = "⏳ AI video generate ho rahi hai (1-2 min)...";
-      resultScript.innerHTML = "<i>🔄 Please wait... Backend server se response aa raha hai. Ensure server is running.</i>";
-      document.getElementById("resultCard").style.display = "block";
-
-      try {
-        // 👇 Apne local backend server ko call karein
-        const response = await fetch("http://localhost:5000/generate-video", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ script: script })
+        // Hold to speak (Mouse)
+        micBtn.addEventListener('mousedown', () => {
+            if(!isListening) {
+                recognition.start();
+                isListening = true;
+                micBtn.classList.add('listening');
+            }
+        });
+        micBtn.addEventListener('mouseup', () => {
+            if(isListening) {
+                recognition.stop();
+            }
+        });
+        micBtn.addEventListener('mouseleave', () => {
+            if(isListening) {
+                recognition.stop();
+            }
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error || "Server error");
-        }
-
-        // Video player mein dikhayein
-        resultScript.innerHTML = `
-          <video controls style="width:100%; max-height:400px; border-radius:12px; margin-top:10px;">
-            <source src="${data.videoUrl}" type="video/mp4">
-            Aapka browser video support nahi karta.
-          </video>
-        `;
-        message.innerHTML = "🎬 AI Video ready! (Generated by FAL.ai)";
-
-      } catch (error) {
-        console.error("Error:", error);
-        message.innerHTML = "❌ Error: " + error.message + ". Ensure server.js is running on port 5000.";
-        resultScript.innerHTML = "<span style='color:red;'>❌ Server connection failed. Backend start karein (node server.js).</span>";
-      }
+        // Hold to speak (Touch - Mobile)
+        micBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if(!isListening) {
+                recognition.start();
+                isListening = true;
+                micBtn.classList.add('listening');
+            }
+        });
+        micBtn.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            if(isListening) {
+                recognition.stop();
+            }
+        });
+    } else {
+        micBtn.style.opacity = '0.5';
+        micBtn.title = "Voice not supported in this browser";
     }
-  </script>
+</script>
+
 </body>
 </html>
