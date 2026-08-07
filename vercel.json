@@ -5,6 +5,5 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" }
-  ],
-  "buildCommand": "npm install"
+  ]
 }
