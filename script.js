@@ -1,5 +1,5 @@
 // =============================================
-// 1. LOGIN / AUTH
+// 1. LOGIN / AUTH (Fixed)
 // =============================================
 let currentUser = null;
 let isLogin = true;
@@ -16,21 +16,46 @@ function handleLogin() {
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPassword').value.trim();
   const name = document.getElementById('loginName').value.trim();
-  if (!email || !pass) { document.getElementById('loginError').textContent = '⚠️ Email & password required!'; return; }
-  if (!isLogin && !name) { document.getElementById('loginError').textContent = '⚠️ Full name required!'; return; }
 
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  if (!email || !pass) {
+    document.getElementById('loginError').textContent = '⚠️ Email & password required!';
+    return;
+  }
+  if (!isLogin && !name) {
+    document.getElementById('loginError').textContent = '⚠️ Full name required!';
+    return;
+  }
+
+  let users = JSON.parse(localStorage.getItem('users') || '[]');
+
   if (isLogin) {
-    const user = users.find(u => u.email === email && u.pass === pass);
-    if (user) { currentUser = user; localStorage.setItem('user', JSON.stringify(currentUser)); showApp(); }
-    else { document.getElementById('loginError').textContent = '❌ Invalid email or password!'; }
+    let user = users.find(u => u.email === email && u.pass === pass);
+    if (user) {
+      currentUser = user;
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      document.getElementById('loginError').textContent = '';
+      showApp();
+    } else {
+      // Auto-create account if not exists
+      const newUser = { email, pass, name: name || email.split('@')[0], projects: [], stats: { videos: 0, images: 0, audio: 0 } };
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+      currentUser = newUser;
+      localStorage.setItem('user', JSON.stringify(currentUser));
+      document.getElementById('loginError').textContent = '';
+      showApp();
+    }
   } else {
-    if (users.find(u => u.email === email)) { document.getElementById('loginError').textContent = '❌ Email exists!'; return; }
+    if (users.find(u => u.email === email)) {
+      document.getElementById('loginError').textContent = '❌ Email exists! Try logging in.';
+      return;
+    }
     const newUser = { email, pass, name, projects: [], stats: { videos: 0, images: 0, audio: 0 } };
     users.push(newUser);
     localStorage.setItem('users', JSON.stringify(users));
     currentUser = newUser;
     localStorage.setItem('user', JSON.stringify(currentUser));
+    document.getElementById('loginError').textContent = '';
     showApp();
   }
 }
@@ -38,8 +63,8 @@ function handleLogin() {
 function showApp() {
   document.getElementById('loginPage').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-  document.getElementById('displayName').textContent = currentUser.name;
-  document.getElementById('dashName').textContent = currentUser.name;
+  document.getElementById('displayName').textContent = currentUser.name || currentUser.email;
+  document.getElementById('dashName').textContent = currentUser.name || currentUser.email;
   updateDashboard();
 }
 
@@ -52,12 +77,17 @@ function logout() {
 
 window.onload = function() {
   const saved = localStorage.getItem('user');
-  if (saved) { currentUser = JSON.parse(saved); showApp(); }
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    showApp();
+  }
   setupSliders();
 };
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') handleLogin();
+  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') {
+    handleLogin();
+  }
 });
 
 // =============================================
@@ -95,7 +125,6 @@ function updateDashboard() {
   document.getElementById('statImages').textContent = stats.images || 0;
   document.getElementById('statAudio').textContent = stats.audio || 0;
 
-  // Recent projects (last 3)
   const projects = currentUser.projects || [];
   const recent = projects.slice(-3).reverse();
   const container = document.getElementById('recentProjects');
@@ -151,7 +180,6 @@ function renderProjects() {
     container.innerHTML = '<p style="color:#666;">No projects yet. Create your first project above!</p>';
     return;
   }
-  // Show latest first
   const sorted = [...projects].reverse();
   sorted.forEach(p => {
     const card = document.createElement('div');
@@ -172,19 +200,9 @@ function renderProjects() {
 function openProject(id) {
   const project = currentUser.projects.find(p => p.id === id);
   if (!project) return;
-  // Switch to corresponding tool
   const toolMap = { video: 'video', audio: 'audio', image: 'image', chat: 'chat', other: 'dashboard' };
   const tool = toolMap[project.type] || 'dashboard';
   switchTool(tool);
-  // Fill script if tool has textarea
-  setTimeout(() => {
-    const scriptAreas = document.querySelectorAll('textarea');
-    scriptAreas.forEach(ta => {
-      if (ta.id.includes('Script') || ta.id.includes('script')) {
-        ta.value = `Project: ${project.name}`;
-      }
-    });
-  }, 100);
 }
 
 function deleteProject(id) {
@@ -405,4 +423,4 @@ function setupSliders() {
   const r = document.getElementById('audioRate');
   const rv = document.getElementById('rateVal');
   if (r && rv) r.addEventListener('input', () => rv.textContent = r.value);
-}
+        }
