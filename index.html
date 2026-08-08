@@ -8,354 +8,305 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
     body { background: #0b0b0f; color: white; min-height: 100vh; }
     
-    /* ===== LOGIN PAGE ===== */
+    /* ===== LOGIN ===== */
     #loginPage {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: #0b0b0f;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 9999;
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; background: #0b0b0f;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999;
     }
-    .login-container {
-      background: #15151d;
-      padding: 45px 35px;
-      border-radius: 24px;
-      max-width: 400px;
-      width: 90%;
-      border: 2px solid #d4af37;
-      text-align: center;
+    .login-box {
+      background: #15151d; padding: 40px 30px; border-radius: 20px;
+      max-width: 380px; width: 90%; border: 2px solid #d4af37; text-align: center;
     }
-    .login-container h1 { color: #d4af37; font-size: 36px; margin-bottom: 5px; }
-    .login-container .sub { color: #999; margin-bottom: 25px; font-size: 16px; }
-    .login-container input {
-      width: 100%; padding: 16px; margin-bottom: 15px;
-      border-radius: 12px; border: 1px solid #444; background: #0e0e14; color: white; font-size: 16px;
-    }
-    .login-container .btn {
-      width: 100%; padding: 16px; border-radius: 12px; background: #d4af37; color: #111;
-      font-size: 18px; font-weight: bold; border: none; cursor: pointer; transition: 0.3s;
-    }
-    .login-container .btn:hover { transform: scale(1.02); }
-    .login-container .switch-link { color: #d4af37; cursor: pointer; display: block; margin-top: 15px; }
-    .login-container .switch-link:hover { text-decoration: underline; }
-    .login-error { color: #ff6b6b; margin-top: 10px; font-size: 14px; }
-
-    /* ===== MAIN APP (Hidden until login) ===== */
-    #appContainer {
-      display: none;
-      min-height: 100vh;
-    }
-
-    /* ===== NAVIGATION ===== */
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 30px;
-      background: #15151d;
-      border-bottom: 3px solid #d4af37;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .navbar .logo { font-size: 26px; font-weight: bold; color: #d4af37; }
-    .navbar .logo span { color: white; }
-    .navbar .user-info { display: flex; align-items: center; gap: 15px; color: #ccc; }
-    .navbar .user-info .name { color: #d4af37; font-weight: bold; }
-    .btn-logout { background: #333; color: white; padding: 8px 16px; border-radius: 20px; border: none; cursor: pointer; }
-    .btn-logout:hover { background: #555; }
-
-    /* ===== MAIN LAYOUT ===== */
-    .app-layout {
-      display: flex;
-      max-width: 1400px;
-      margin: 20px auto;
-      padding: 0 18px;
-      gap: 25px;
-      min-height: 80vh;
-    }
-
-    /* ===== LEFT SIDEBAR - TOOLS ===== */
-    .sidebar {
-      flex: 0 0 220px;
-      background: #15151d;
-      border-radius: 16px;
-      padding: 20px 15px;
-      border: 1px solid #2a2a35;
-      height: fit-content;
-    }
-    .sidebar .tool-item {
-      padding: 14px 16px;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: 0.3s;
-      color: #aaa;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 4px;
-    }
-    .sidebar .tool-item:hover { background: #1a1a28; color: white; }
-    .sidebar .tool-item.active { background: #d4af37; color: #111; font-weight: bold; }
-    .sidebar .tool-item .icon { font-size: 22px; }
-
-    /* ===== RIGHT PANEL ===== */
-    .panel {
-      flex: 1;
-      background: #15151d;
-      border-radius: 16px;
-      padding: 25px;
-      border: 1px solid #2a2a35;
-      min-height: 500px;
-    }
-    .panel h2 { color: #d4af37; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-    .panel .tool-content { display: none; }
-    .panel .tool-content.active { display: block; }
-
-    /* ===== FORM ELEMENTS ===== */
-    input, select, textarea {
+    .login-box h1 { color: #d4af37; font-size: 34px; }
+    .login-box .sub { color: #999; margin-bottom: 20px; }
+    .login-box input {
       width: 100%; padding: 14px; margin-bottom: 12px;
-      border-radius: 10px; border: 1px solid #444; background: #0e0e14; color: white; font-size: 16px;
+      border-radius: 10px; border: 1px solid #444; background: #0e0e14; color: white;
     }
-    textarea { min-height: 120px; resize: vertical; }
-    .btn { padding: 14px 28px; border-radius: 12px; background: #d4af37; color: #111; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
-    .btn:hover { transform: scale(1.03); }
-    .btn-secondary { background: #333; color: white; }
-    .btn-sm { padding: 10px 18px; font-size: 14px; }
-    .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
-    .flex-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .message { margin-top: 15px; color: #d4af37; font-size: 17px; }
-    .result-box { margin-top: 15px; padding: 15px; background: #0e0e14; border-radius: 12px; border: 1px solid #333; }
-    .result-box video, .result-box img { max-width: 100%; max-height: 300px; border-radius: 10px; }
+    .login-box .btn { width: 100%; padding: 14px; border-radius: 10px; background: #d4af37; color: #111; font-weight: bold; border: none; cursor: pointer; }
+    .login-box .switch { color: #d4af37; cursor: pointer; display: block; margin-top: 12px; }
+    .login-box .error { color: #ff6b6b; margin-top: 10px; font-size: 14px; }
 
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      .app-layout { flex-direction: column; }
-      .sidebar { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 15px; }
-      .sidebar .tool-item { padding: 10px 14px; font-size: 14px; }
+    /* ===== APP ===== */
+    #app { display: none; }
+    .nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 25px; background: #15151d; border-bottom: 3px solid #d4af37;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .nav .logo { color: #d4af37; font-size: 24px; font-weight: bold; }
+    .nav .user { display: flex; align-items: center; gap: 15px; color: #ccc; }
+    .nav .user .name { color: #d4af37; font-weight: bold; }
+    .btn-logout { background: #333; color: white; padding: 6px 16px; border-radius: 15px; border: none; cursor: pointer; }
+
+    /* ===== LAYOUT ===== */
+    .layout { display: flex; max-width: 1400px; margin: 20px auto; padding: 0 15px; gap: 20px; min-height: 70vh; }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      flex: 0 0 200px; background: #15151d; border-radius: 14px; padding: 15px; border: 1px solid #2a2a35; height: fit-content;
+    }
+    .sidebar .tool {
+      padding: 12px 14px; border-radius: 10px; cursor: pointer; color: #aaa; margin-bottom: 2px;
+      transition: 0.3s; display: flex; align-items: center; gap: 10px;
+    }
+    .sidebar .tool:hover { background: #1a1a28; color: white; }
+    .sidebar .tool.active { background: #d4af37; color: #111; font-weight: bold; }
+
+    /* ===== PANEL ===== */
+    .panel {
+      flex: 1; background: #15151d; border-radius: 14px; padding: 25px; border: 1px solid #2a2a35;
+    }
+    .panel h2 { color: #d4af37; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 8px; }
+    .panel .content { display: none; }
+    .panel .content.active { display: block; }
+
+    /* ===== FORM ===== */
+    input, select, textarea {
+      width: 100%; padding: 12px; margin-bottom: 10px;
+      border-radius: 8px; border: 1px solid #444; background: #0e0e14; color: white;
+    }
+    textarea { min-height: 100px; resize: vertical; }
+    .btn { padding: 12px 22px; border-radius: 10px; background: #d4af37; color: #111; font-weight: bold; border: none; cursor: pointer; }
+    .btn:hover { opacity: 0.85; }
+    .btn-s { background: #333; color: white; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+    .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .msg { margin-top: 12px; color: #d4af37; }
+    .result { margin-top: 12px; padding: 12px; background: #0e0e14; border-radius: 10px; border: 1px solid #333; display: none; }
+    .result video, .result img { max-width: 100%; max-height: 250px; border-radius: 8px; }
+
+    /* ===== CHAT ===== */
+    .chat-box { max-height: 200px; overflow-y: auto; background: #0e0e14; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+    .chat-msg { padding: 8px 12px; border-radius: 8px; margin: 4px 0; }
+    .chat-user { background: #2a2a3a; text-align: right; max-width: 80%; margin-left: auto; }
+    .chat-bot { background: #1a1a2a; max-width: 80%; }
+
+    /* ===== PROJECT CARDS ===== */
+    .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
+    .project-card {
+      background: #1a1a28; padding: 18px; border-radius: 12px; border: 1px solid #333; transition: 0.3s;
+    }
+    .project-card:hover { border-color: #d4af37; transform: translateY(-3px); }
+    .project-card h4 { color: #d4af37; }
+    .project-card .date { color: #666; font-size: 12px; }
+    .project-card .actions { margin-top: 10px; display: flex; gap: 8px; }
+    .project-card .actions button { padding: 4px 12px; border-radius: 6px; border: none; cursor: pointer; font-size: 12px; }
+    .btn-del { background: #8b0000; color: white; }
+    .btn-view { background: #d4af37; color: #111; }
+
+    /* ===== STATS ===== */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 15px 0; }
+    .stat-card { background: #1a1a28; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #333; }
+    .stat-card .num { font-size: 32px; color: #d4af37; font-weight: bold; }
+    .stat-card .label { color: #888; font-size: 14px; }
+
+    @media (max-width: 700px) {
+      .layout { flex-direction: column; }
+      .sidebar { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 12px; }
+      .sidebar .tool { padding: 8px 12px; font-size: 13px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ========================================== -->
-<!-- ===== LOGIN PAGE ===== -->
-<!-- ========================================== -->
+<!-- ===== LOGIN ===== -->
 <div id="loginPage">
-  <div class="login-container">
+  <div class="login-box">
     <h1>👑 Empire AI</h1>
-    <p class="sub">Login to access your studio</p>
+    <p class="sub">Login to your studio</p>
     <input type="text" id="loginEmail" placeholder="Email">
     <input type="password" id="loginPassword" placeholder="Password">
     <input type="text" id="loginName" placeholder="Full Name" style="display:none;">
     <button class="btn" id="loginBtn" onclick="handleLogin()">Login</button>
-    <span class="switch-link" id="switchLink" onclick="switchAuthMode()">Don't have account? Sign Up</span>
-    <div id="loginError" class="login-error"></div>
+    <span class="switch" id="switchLink" onclick="switchMode()">Don't have account? Sign Up</span>
+    <div class="error" id="loginError"></div>
   </div>
 </div>
 
-<!-- ========================================== -->
-<!-- ===== MAIN APP (Hidden until login) ===== -->
-<!-- ========================================== -->
-<div id="appContainer">
+<!-- ===== APP ===== -->
+<div id="app">
 
-  <!-- NAVIGATION -->
-  <nav class="navbar">
-    <div class="logo">Empire<span>AI</span> Studio</div>
-    <div class="user-info">
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="logo">Empire AI Studio</div>
+    <div class="user">
       <span>👋 <span class="name" id="displayName">User</span></span>
-      <button class="btn-logout" onclick="logoutUser()">Logout</button>
+      <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
   </nav>
 
   <!-- LAYOUT -->
-  <div class="app-layout">
+  <div class="layout">
 
-    <!-- SIDEBAR - TOOLS -->
-    <div class="sidebar" id="sidebar">
-      <div class="tool-item active" data-tool="dashboard" onclick="switchTool('dashboard')">
-        <span class="icon">📊</span> Dashboard
-      </div>
-      <div class="tool-item" data-tool="text-to-video" onclick="switchTool('text-to-video')">
-        <span class="icon">🎬</span> Text-to-Video
-      </div>
-      <div class="tool-item" data-tool="text-to-audio" onclick="switchTool('text-to-audio')">
-        <span class="icon">🗣️</span> Text-to-Audio
-      </div>
-      <div class="tool-item" data-tool="text-to-image" onclick="switchTool('text-to-image')">
-        <span class="icon">🖼️</span> Text-to-Image
-      </div>
-      <div class="tool-item" data-tool="ai-chat" onclick="switchTool('ai-chat')">
-        <span class="icon">🤖</span> AI Chat
-      </div>
-      <div class="tool-item" data-tool="translate" onclick="switchTool('translate')">
-        <span class="icon">🌍</span> Translate
-      </div>
-      <div class="tool-item" data-tool="captions" onclick="switchTool('captions')">
-        <span class="icon">📝</span> Captions
-      </div>
-      <div class="tool-item" data-tool="video-effects" onclick="switchTool('video-effects')">
-        <span class="icon">🎨</span> Video Effects
-      </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="tool active" data-tool="dashboard" onclick="switchTool('dashboard')">📊 Dashboard</div>
+      <div class="tool" data-tool="projects" onclick="switchTool('projects')">📁 Projects</div>
+      <div class="tool" data-tool="video" onclick="switchTool('video')">🎬 Text→Video</div>
+      <div class="tool" data-tool="audio" onclick="switchTool('audio')">🗣️ Text→Audio</div>
+      <div class="tool" data-tool="image" onclick="switchTool('image')">🖼️ Text→Image</div>
+      <div class="tool" data-tool="chat" onclick="switchTool('chat')">🤖 AI Chat</div>
+      <div class="tool" data-tool="translate" onclick="switchTool('translate')">🌍 Translate</div>
+      <div class="tool" data-tool="captions" onclick="switchTool('captions')">📝 Captions</div>
+      <div class="tool" data-tool="effects" onclick="switchTool('effects')">🎨 Effects</div>
     </div>
 
     <!-- PANEL -->
     <div class="panel">
-      <div id="toolTitle"><h2>📊 Dashboard</h2></div>
+      <div id="panelTitle"><h2>📊 Dashboard</h2></div>
 
       <!-- ===== DASHBOARD ===== -->
-      <div class="tool-content active" id="tool-dashboard">
+      <div class="content active" id="content-dashboard">
         <h3>Welcome, <span id="dashName">User</span>! 👋</h3>
-        <p style="color:#999; margin-bottom:20px;">Select a tool from the left sidebar to get started.</p>
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:15px;">
-          <div style="background:#1a1a28; padding:20px; border-radius:12px; text-align:center; border:1px solid #333;">
-            <div style="font-size:30px;">🎬</div>
-            <h4>Text-to-Video</h4>
-            <p style="color:#888; font-size:14px;">Generate videos from text</p>
-          </div>
-          <div style="background:#1a1a28; padding:20px; border-radius:12px; text-align:center; border:1px solid #333;">
-            <div style="font-size:30px;">🗣️</div>
-            <h4>Text-to-Audio</h4>
-            <p style="color:#888; font-size:14px;">Convert text to speech</p>
-          </div>
-          <div style="background:#1a1a28; padding:20px; border-radius:12px; text-align:center; border:1px solid #333;">
-            <div style="font-size:30px;">🖼️</div>
-            <h4>Text-to-Image</h4>
-            <p style="color:#888; font-size:14px;">Generate images from text</p>
-          </div>
-          <div style="background:#1a1a28; padding:20px; border-radius:12px; text-align:center; border:1px solid #333;">
-            <div style="font-size:30px;">🤖</div>
-            <h4>AI Chat</h4>
-            <p style="color:#888; font-size:14px;">Chat with Gemini AI</p>
-          </div>
+        <p style="color:#999;">Here's your studio overview</p>
+
+        <div class="stats">
+          <div class="stat-card"><div class="num" id="statProjects">0</div><div class="label">Total Projects</div></div>
+          <div class="stat-card"><div class="num" id="statVideos">0</div><div class="label">Videos Generated</div></div>
+          <div class="stat-card"><div class="num" id="statImages">0</div><div class="label">Images Generated</div></div>
+          <div class="stat-card"><div class="num" id="statAudio">0</div><div class="label">Audio Generated</div></div>
+        </div>
+
+        <h4 style="margin:20px 0 10px; color:#d4af37;">📁 Recent Projects</h4>
+        <div id="recentProjects" class="project-grid"></div>
+
+        <div style="margin-top:15px;">
+          <button class="btn" onclick="switchTool('projects')">📁 View All Projects</button>
         </div>
       </div>
 
-      <!-- ===== TEXT-TO-VIDEO ===== -->
-      <div class="tool-content" id="tool-text-to-video">
-        <h3>🎬 Text-to-Video</h3>
-        <p style="color:#999; font-size:14px; margin-bottom:15px;">Generate a video from your script. Free, no API key needed.</p>
-        <textarea id="videoScript" placeholder="Enter your script... e.g. A robot dancing on Mars"></textarea>
-        <button class="btn" onclick="generateVideo()">🎬 Generate Video</button>
-        <div id="videoResult" class="result-box" style="display:none;"></div>
-        <div id="videoMessage" class="message"></div>
+      <!-- ===== PROJECTS ===== -->
+      <div class="content" id="content-projects">
+        <h3>📁 Project Manager</h3>
+        <p style="color:#999; font-size:14px;">Create, save and manage your projects</p>
+
+        <div style="background:#1a1a28; padding:15px; border-radius:12px; margin:15px 0;">
+          <h4 style="color:#d4af37;">+ New Project</h4>
+          <div class="flex">
+            <input type="text" id="projectNameInput" placeholder="Project name..." style="flex:1;">
+            <select id="projectType" style="flex:0 0 150px;">
+              <option value="video">Text→Video</option>
+              <option value="audio">Text→Audio</option>
+              <option value="image">Text→Image</option>
+              <option value="chat">AI Chat</option>
+              <option value="other">Other</option>
+            </select>
+            <button class="btn" onclick="createProject()">+ Create</button>
+          </div>
+        </div>
+
+        <div id="projectList" class="project-grid"></div>
+        <div id="projectMsg" class="msg"></div>
       </div>
 
-      <!-- ===== TEXT-TO-AUDIO ===== -->
-      <div class="tool-content" id="tool-text-to-audio">
-        <h3>🗣️ Text-to-Audio</h3>
-        <p style="color:#999; font-size:14px; margin-bottom:15px;">Convert text to speech with custom voice settings.</p>
-        <textarea id="audioScript" placeholder="Enter text to speak..."></textarea>
-        <div style="background:#1a1a28; padding:15px; border-radius:12px; margin:10px 0;">
-          <label>🌍 Language:</label>
+      <!-- ===== TEXT→VIDEO ===== -->
+      <div class="content" id="content-video">
+        <h3>🎬 Text→Video</h3>
+        <p style="color:#999; font-size:14px;">Generate video from script (free).</p>
+        <textarea id="videoScript" placeholder="Script... e.g. A robot dancing on Mars"></textarea>
+        <button class="btn" onclick="genVideo()">🎬 Generate</button>
+        <div class="result" id="videoResult"></div>
+        <div class="msg" id="videoMsg"></div>
+      </div>
+
+      <!-- ===== TEXT→AUDIO ===== -->
+      <div class="content" id="content-audio">
+        <h3>🗣️ Text→Audio</h3>
+        <textarea id="audioScript" placeholder="Text to speak..."></textarea>
+        <div style="background:#1a1a28; padding:12px; border-radius:10px; margin:10px 0;">
           <select id="audioLang">
             <option value="en-GB">English (UK)</option>
-            <option value="en-US">English (US)</option>
-            <option value="ur-PK">Urdu (اردو)</option>
-            <option value="hi-IN">Hindi (हिन्दी)</option>
-            <option value="ar-SA">Arabic (العربية)</option>
-            <option value="es-ES">Spanish</option>
-            <option value="fr-FR">French</option>
+            <option value="ur-PK">Urdu</option>
+            <option value="hi-IN">Hindi</option>
+            <option value="ar-SA">Arabic</option>
           </select>
-          <label>🎭 Style:</label>
           <select id="audioStyle">
             <option value="normal">Normal</option>
-            <option value="poetry">Poetry (Slow)</option>
-            <option value="sad">Sad (Slow & Low)</option>
-            <option value="excited">Excited (Fast & High)</option>
-            <option value="robot">Robot</option>
+            <option value="poetry">Poetry</option>
+            <option value="sad">Sad</option>
+            <option value="excited">Excited</option>
           </select>
-          <label>⏩ Speed: <span id="audioRateVal">0.9</span></label>
+          <label>Speed: <span id="rateVal">0.9</span></label>
           <input type="range" id="audioRate" min="0.1" max="3" step="0.1" value="0.9" style="width:100%;">
-          <label>🎵 Pitch: <span id="audioPitchVal">1.0</span></label>
-          <input type="range" id="audioPitch" min="0.5" max="2" step="0.1" value="1.0" style="width:100%;">
         </div>
         <div class="btn-group">
           <button class="btn" onclick="speakAudio()">🔊 Listen</button>
-          <button class="btn btn-secondary" onclick="downloadAudio()">💾 Download MP3</button>
+          <button class="btn btn-s" onclick="downloadAudio()">💾 Download</button>
         </div>
-        <div id="audioMessage" class="message"></div>
+        <div class="msg" id="audioMsg"></div>
       </div>
 
-      <!-- ===== TEXT-TO-IMAGE ===== -->
-      <div class="tool-content" id="tool-text-to-image">
-        <h3>🖼️ Text-to-Image</h3>
-        <p style="color:#999; font-size:14px; margin-bottom:15px;">Generate images from text descriptions. Free, no API key.</p>
-        <div class="flex-row">
+      <!-- ===== TEXT→IMAGE ===== -->
+      <div class="content" id="content-image">
+        <h3>🖼️ Text→Image</h3>
+        <p style="color:#999; font-size:14px;">Free, no API key.</p>
+        <div class="flex">
           <input type="text" id="imagePrompt" placeholder="Describe image..." style="flex:1;">
-          <button class="btn" onclick="generateImage()">✨ Generate</button>
+          <button class="btn" onclick="genImage()">✨ Generate</button>
         </div>
-        <div id="imageResult" class="result-box" style="display:none;"></div>
-        <div id="imageMessage" class="message"></div>
+        <div class="result" id="imageResult"></div>
+        <div class="msg" id="imageMsg"></div>
       </div>
 
       <!-- ===== AI CHAT ===== -->
-      <div class="tool-content" id="tool-ai-chat">
+      <div class="content" id="content-chat">
         <h3>🤖 AI Chat</h3>
-        <p style="color:#999; font-size:14px; margin-bottom:15px;">Chat with Gemini AI. Enter your free API key below.</p>
         <input type="text" id="chatKey" placeholder="Gemini API Key (free from ai.google.dev)">
-        <div style="max-height:300px; overflow-y:auto; background:#0e0e14; border-radius:12px; padding:15px; margin-bottom:10px;" id="chatContainer">
-          <div style="background:#1a1a2a; padding:12px; border-radius:10px; margin:5px 0;"><b>Bot:</b> Hi! Ask me anything.</div>
+        <div class="chat-box" id="chatBox">
+          <div class="chat-msg chat-bot"><b>Bot:</b> Hi! Ask me anything.</div>
         </div>
-        <div class="flex-row">
+        <div class="flex">
           <input type="text" id="chatInput" placeholder="Type message..." style="flex:1;">
-          <button class="btn" onclick="sendChatMessage()">Send</button>
+          <button class="btn" onclick="sendChat()">Send</button>
         </div>
-        <div id="chatMessage" class="message"></div>
+        <div class="msg" id="chatMsg"></div>
       </div>
 
       <!-- ===== TRANSLATE ===== -->
-      <div class="tool-content" id="tool-translate">
+      <div class="content" id="content-translate">
         <h3>🌍 Translate</h3>
-        <p style="color:#999; font-size:14px; margin-bottom:15px;">Translate your script to any language.</p>
-        <textarea id="translateScript" placeholder="Enter text to translate..."></textarea>
-        <div class="flex-row">
-          <select id="translateTarget" style="flex:1;">
+        <textarea id="transScript" placeholder="Text to translate..."></textarea>
+        <div class="flex">
+          <select id="transTarget" style="flex:1;">
             <option value="en">English</option>
-            <option value="ur">Urdu (اردو)</option>
-            <option value="hi">Hindi (हिन्दी)</option>
-            <option value="ar">Arabic (العربية)</option>
+            <option value="ur">Urdu</option>
+            <option value="hi">Hindi</option>
+            <option value="ar">Arabic</option>
             <option value="es">Spanish</option>
-            <option value="fr">French</option>
-            <option value="de">German</option>
-            <option value="ja">Japanese</option>
-            <option value="zh">Chinese</option>
           </select>
-          <button class="btn" onclick="translateText()">🔁 Translate</button>
+          <button class="btn" onclick="doTranslate()">🔁 Translate</button>
         </div>
-        <div id="translateResult" class="result-box" style="display:none;"></div>
-        <div id="translateMessage" class="message"></div>
+        <div class="result" id="transResult"></div>
+        <div class="msg" id="transMsg"></div>
       </div>
 
       <!-- ===== CAPTIONS ===== -->
-      <div class="tool-content" id="tool-captions">
+      <div class="content" id="content-captions">
         <h3>📝 Captions</h3>
-        <p style="color:#999; font-size:14px; margin-bottom:15px;">Generate captions from your script.</p>
-        <textarea id="captionsScript" placeholder="Enter script for captions..."></textarea>
-        <button class="btn" onclick="generateCaptions()">📝 Generate Captions</button>
-        <div id="captionsResult" class="result-box" style="display:none;"></div>
-        <div id="captionsMessage" class="message"></div>
+        <textarea id="capScript" placeholder="Script for captions..."></textarea>
+        <button class="btn" onclick="genCaptions()">📝 Generate</button>
+        <div class="result" id="capResult"></div>
+        <div class="msg" id="capMsg"></div>
       </div>
 
-      <!-- ===== VIDEO EFFECTS ===== -->
-      <div class="tool-content" id="tool-video-effects">
+      <!-- ===== EFFECTS ===== -->
+      <div class="content" id="content-effects">
         <h3>🎨 Video Effects</h3>
-        <p style="color:#999; font-size:14px; margin-bottom:15px;">Upload video and apply filters.</p>
-        <input type="file" id="effectVideo" accept="video/*">
+        <input type="file" id="effectFile" accept="video/*">
         <div class="btn-group">
-          <button class="btn btn-secondary" onclick="applyVideoFilter('grayscale')">⚫ Grayscale</button>
-          <button class="btn btn-secondary" onclick="applyVideoFilter('sepia')">🟫 Sepia</button>
-          <button class="btn btn-secondary" onclick="applyVideoFilter('brightness')">☀️ Bright</button>
-          <button class="btn btn-secondary" onclick="applyVideoFilter('none')">🔄 Reset</button>
-          <button class="btn" onclick="downloadEffectVideo()">💾 Download</button>
+          <button class="btn btn-s" onclick="applyEffect('grayscale')">⚫ Grayscale</button>
+          <button class="btn btn-s" onclick="applyEffect('sepia')">🟫 Sepia</button>
+          <button class="btn btn-s" onclick="applyEffect('brightness')">☀️ Bright</button>
+          <button class="btn btn-s" onclick="applyEffect('none')">🔄 Reset</button>
+          <button class="btn" onclick="downloadEffect()">💾 Download</button>
         </div>
-        <div style="position:relative; width:100%; max-height:400px; background:#000; border-radius:12px; overflow:hidden; margin-top:10px;">
-          <video id="effectVideoPreview" controls style="width:100%; max-height:400px; display:none;"></video>
+        <div style="background:#000; border-radius:10px; overflow:hidden; margin-top:10px;">
+          <video id="effectVideo" controls style="width:100%; max-height:250px; display:none;"></video>
           <canvas id="effectCanvas" style="display:none;"></canvas>
         </div>
-        <div id="effectMessage" class="message"></div>
+        <div class="msg" id="effectMsg"></div>
       </div>
 
     </div>
