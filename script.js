@@ -314,4 +314,95 @@ document.getElementById('chatInput').addEventListener('keyup', e => { if (e.key 
 // 9. TRANSLATE
 // =============================================
 async function doTranslate() {
-  const t = document.getElementById('transScript
+  const t = document.getElementById('transScript').value.trim();
+  if (!t) { document.getElementById('transMsg').textContent = '⚠️ Enter text!'; return; }
+  const target = document.getElementById('transTarget').value;
+  const r = document.getElementById('transResult');
+  r.style.display = 'block';
+  document.getElementById('transMsg').textContent = '⏳ Translating...';
+  try {
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(t)}`);
+    const data = await res.json();
+    r.innerHTML = data[0][0][0];
+    document.getElementById('transMsg').textContent = '✅ Done!';
+  } catch(e) { r.innerHTML = '❌ Error'; document.getElementById('transMsg').textContent = '❌ Failed.'; }
+}
+
+// =============================================
+// 10. CAPTIONS
+// =============================================
+function genCaptions() {
+  const s = document.getElementById('capScript').value.trim();
+  if (!s) { document.getElementById('capMsg').textContent = '⚠️ Enter script!'; return; }
+  const r = document.getElementById('capResult');
+  r.style.display = 'block';
+  r.innerHTML = '📝 ' + s;
+  document.getElementById('capMsg').textContent = '✅ Captions ready!';
+}
+
+// =============================================
+// 11. EFFECTS
+// =============================================
+document.getElementById('effectFile').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const v = document.getElementById('effectVideo');
+    v.src = URL.createObjectURL(file);
+    v.style.display = 'block';
+  }
+});
+
+function applyEffect(filter) {
+  const v = document.getElementById('effectVideo');
+  if (!v.src || v.style.display === 'none') { document.getElementById('effectMsg').textContent = '⚠️ Upload video first!'; return; }
+  const canvas = document.getElementById('effectCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = v.videoWidth || 640;
+  canvas.height = v.videoHeight || 360;
+  const draw = () => {
+    ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+    if (filter !== 'none') {
+      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const d = img.data;
+      if (filter === 'grayscale') {
+        for (let i = 0; i < d.length; i += 4) {
+          const g = 0.34 * d[i] + 0.5 * d[i+1] + 0.16 * d[i+2];
+          d[i] = d[i+1] = d[i+2] = g;
+        }
+      } else if (filter === 'sepia') {
+        for (let i = 0; i < d.length; i += 4) {
+          let r = d[i], g = d[i+1], b = d[i+2];
+          d[i] = Math.min(255, r*0.393 + g*0.769 + b*0.189);
+          d[i+1] = Math.min(255, r*0.349 + g*0.686 + b*0.168);
+          d[i+2] = Math.min(255, r*0.272 + g*0.534 + b*0.131);
+        }
+      } else if (filter === 'brightness') {
+        for (let i = 0; i < d.length; i++) d[i] = Math.min(255, d[i] * 1.3);
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+    requestAnimationFrame(draw);
+  };
+  v.play();
+  setTimeout(draw, 100);
+  document.getElementById('effectMsg').textContent = '✅ Filter: ' + filter;
+}
+
+function downloadEffect() {
+  const v = document.getElementById('effectVideo');
+  if (!v.src) { document.getElementById('effectMsg').textContent = '⚠️ Upload video!'; return; }
+  const a = document.createElement('a');
+  a.href = v.src;
+  a.download = 'video_effect.mp4';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  document.getElementById('effectMsg').textContent = '✅ Download started!';
+}
+
+// =============================================
+// 12. SLIDERS
+// =============================================
+function setupSliders() {
+  const r = document.getElementById('audioRate');
+  const rv = document.getElementById('rateVal');
+  if (r && rv) r.addEventListener('input', () => rv.textContent = r.value);
+}
