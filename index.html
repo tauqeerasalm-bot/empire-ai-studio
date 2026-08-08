@@ -3,11 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Empire AI Studio Pro</title>
+  <title>Empire AI Studio</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
     body { background: #0b0b0f; color: white; min-height: 100vh; }
     
+    /* ===== LOGIN PAGE ===== */
+    #loginPage {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #0b0b0f;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 9999;
+    }
+    .login-container {
+      background: #15151d;
+      padding: 45px 35px;
+      border-radius: 24px;
+      max-width: 400px;
+      width: 90%;
+      border: 2px solid #d4af37;
+      text-align: center;
+    }
+    .login-container h1 { color: #d4af37; font-size: 36px; margin-bottom: 5px; }
+    .login-container .sub { color: #999; margin-bottom: 25px; font-size: 16px; }
+    .login-container input {
+      width: 100%; padding: 16px; margin-bottom: 15px;
+      border-radius: 12px; border: 1px solid #444; background: #0e0e14; color: white; font-size: 16px;
+    }
+    .login-container .btn {
+      width: 100%; padding: 16px; border-radius: 12px; background: #d4af37; color: #111;
+      font-size: 18px; font-weight: bold; border: none; cursor: pointer; transition: 0.3s;
+    }
+    .login-container .btn:hover { transform: scale(1.02); }
+    .login-container .switch-link { color: #d4af37; cursor: pointer; display: block; margin-top: 15px; }
+    .login-container .switch-link:hover { text-decoration: underline; }
+    .login-error { color: #ff6b6b; margin-top: 10px; font-size: 14px; }
+
+    /* ===== MAIN APP (Hidden until login) ===== */
+    #appContainer {
+      display: none;
+      min-height: 100vh;
+    }
+
     /* ===== NAVIGATION ===== */
     .navbar {
       display: flex;
@@ -21,349 +62,303 @@
     }
     .navbar .logo { font-size: 26px; font-weight: bold; color: #d4af37; }
     .navbar .logo span { color: white; }
-    .nav-links {
+    .navbar .user-info { display: flex; align-items: center; gap: 15px; color: #ccc; }
+    .navbar .user-info .name { color: #d4af37; font-weight: bold; }
+    .btn-logout { background: #333; color: white; padding: 8px 16px; border-radius: 20px; border: none; cursor: pointer; }
+    .btn-logout:hover { background: #555; }
+
+    /* ===== MAIN LAYOUT ===== */
+    .app-layout {
       display: flex;
-      gap: 20px;
-      list-style: none;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .nav-links a {
-      color: #d0d0d0;
-      text-decoration: none;
-      font-size: 16px;
-      padding: 8px 14px;
-      border-radius: 8px;
-      transition: 0.3s;
-      cursor: pointer;
-    }
-    .nav-links a:hover, .nav-links a.active {
-      background: #d4af37;
-      color: #111;
-    }
-    .btn-nav {
-      background: #d4af37;
-      color: #111;
-      padding: 10px 22px;
-      border-radius: 25px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      transition: 0.3s;
-    }
-    .btn-nav:hover { transform: scale(1.05); }
-    .btn-nav-outline {
-      background: transparent;
-      color: #d4af37;
-      border: 2px solid #d4af37;
-      padding: 8px 18px;
-      border-radius: 25px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 15px;
-      transition: 0.3s;
-    }
-    .btn-nav-outline:hover { background: #d4af37; color: #111; }
-    .hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      padding: 5px;
-    }
-    .hamburger span { width: 28px; height: 3px; background: white; border-radius: 5px; }
-
-    /* ===== MAIN ===== */
-    main { max-width: 1100px; margin: auto; padding: 20px 18px; }
-    .hero { text-align: center; padding: 40px 10px; }
-    .hero h2 { font-size: 40px; line-height: 1.2; }
-    .hero h2 .highlight { color: #d4af37; }
-    .hero p { color: #cfcfd4; font-size: 18px; max-width: 600px; margin: 15px auto; }
-    .btn { display: inline-block; background: #d4af37; color: #111; padding: 16px 32px; border-radius: 14px; font-size: 18px; font-weight: bold; cursor: pointer; border: none; margin: 8px 5px; transition: 0.3s; }
-    .btn:hover { transform: scale(1.05); }
-    .btn-secondary { background: #333; color: white; }
-    .btn-sm { padding: 10px 18px; font-size: 14px; }
-
-    /* ===== FEATURES GRID ===== */
-    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin: 30px 0; }
-    .feature-card { background: #171720; padding: 20px; border-radius: 16px; border: 1px solid #2a2a35; text-align: center; transition: 0.3s; }
-    .feature-card:hover { border-color: #d4af37; transform: translateY(-5px); }
-    .feature-card .icon { font-size: 40px; margin-bottom: 10px; }
-    .feature-card h3 { color: #d4af37; font-size: 18px; }
-    .feature-card p { color: #aaa; font-size: 14px; }
-
-    /* ===== STUDIO ===== */
-    .studio-box {
-      display: none;
-      max-width: 900px;
+      max-width: 1400px;
       margin: 20px auto;
-      padding: 25px;
-      background: #171720;
-      border: 1px solid #333340;
-      border-radius: 20px;
+      padding: 0 18px;
+      gap: 25px;
+      min-height: 80vh;
     }
-    .studio-box h3 { font-size: 28px; margin-bottom: 15px; color: #d4af37; text-align: center; }
+
+    /* ===== LEFT SIDEBAR - TOOLS ===== */
+    .sidebar {
+      flex: 0 0 220px;
+      background: #15151d;
+      border-radius: 16px;
+      padding: 20px 15px;
+      border: 1px solid #2a2a35;
+      height: fit-content;
+    }
+    .sidebar .tool-item {
+      padding: 14px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 4px;
+    }
+    .sidebar .tool-item:hover { background: #1a1a28; color: white; }
+    .sidebar .tool-item.active { background: #d4af37; color: #111; font-weight: bold; }
+    .sidebar .tool-item .icon { font-size: 22px; }
+
+    /* ===== RIGHT PANEL ===== */
+    .panel {
+      flex: 1;
+      background: #15151d;
+      border-radius: 16px;
+      padding: 25px;
+      border: 1px solid #2a2a35;
+      min-height: 500px;
+    }
+    .panel h2 { color: #d4af37; margin-bottom: 20px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .panel .tool-content { display: none; }
+    .panel .tool-content.active { display: block; }
+
+    /* ===== FORM ELEMENTS ===== */
     input, select, textarea {
-      width: 100%; margin-bottom: 12px; padding: 14px; border-radius: 10px;
-      border: 1px solid #444452; background: #0e0e14; color: white; font-size: 16px;
+      width: 100%; padding: 14px; margin-bottom: 12px;
+      border-radius: 10px; border: 1px solid #444; background: #0e0e14; color: white; font-size: 16px;
     }
     textarea { min-height: 120px; resize: vertical; }
-    .message { margin-top: 15px; color: #d4af37; font-size: 18px; }
-    .section-title { color: #d4af37; font-size: 20px; margin: 15px 0 10px; border-bottom: 1px solid #333; padding-bottom: 8px; }
-    .button-group { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
+    .btn { padding: 14px 28px; border-radius: 12px; background: #d4af37; color: #111; font-weight: bold; border: none; cursor: pointer; transition: 0.3s; }
+    .btn:hover { transform: scale(1.03); }
+    .btn-secondary { background: #333; color: white; }
+    .btn-sm { padding: 10px 18px; font-size: 14px; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin: 10px 0; }
     .flex-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-    .flex-row input[type="file"] { flex: 1; }
-    .voice-controls { background: #1a1a25; padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid #333; }
-    .voice-controls label { color: #ccc; display: block; margin-top: 8px; font-size: 14px; }
-    .voice-controls select, .voice-controls input[type="range"] { width: 100%; padding: 10px; border-radius: 8px; background: #0e0e14; color: white; border: 1px solid #444; margin-bottom: 6px; }
-    .voice-controls input[type="range"] { padding: 0; }
-    .slider-value { color: #d4af37; font-weight: bold; }
-
-    /* ===== MODAL ===== */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(5px);
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: #1a1a25;
-      padding: 35px;
-      border-radius: 20px;
-      max-width: 400px;
-      width: 90%;
-      border: 1px solid #d4af37;
-      position: relative;
-    }
-    .modal-content h2 { color: #d4af37; margin-bottom: 20px; text-align: center; }
-    .modal-content input { width: 100%; margin-bottom: 15px; padding: 14px; border-radius: 10px; border: 1px solid #444; background: #0e0e14; color: white; }
-    .modal-content .btn { width: 100%; padding: 14px; }
-    .modal-close { position: absolute; top: 15px; right: 20px; font-size: 28px; cursor: pointer; color: #999; background: none; border: none; }
-    .modal-close:hover { color: white; }
-    .switch-link { color: #d4af37; cursor: pointer; text-align: center; display: block; margin-top: 15px; }
-    .switch-link:hover { text-decoration: underline; }
-
-    /* ===== DASHBOARD ===== */
-    .dashboard {
-      display: none;
-      background: #171720;
-      padding: 25px;
-      border-radius: 16px;
-      border: 1px solid #d4af37;
-      margin: 20px 0;
-    }
-    .dashboard .user-info { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-    .dashboard .avatar { font-size: 50px; }
+    .message { margin-top: 15px; color: #d4af37; font-size: 17px; }
+    .result-box { margin-top: 15px; padding: 15px; background: #0e0e14; border-radius: 12px; border: 1px solid #333; }
+    .result-box video, .result-box img { max-width: 100%; max-height: 300px; border-radius: 10px; }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
-      .hamburger { display: flex; }
-      .nav-links {
-        display: none;
-        width: 100%;
-        flex-direction: column;
-        align-items: center;
-        gap: 12px;
-        padding: 15px 0;
-        border-top: 1px solid #333;
-      }
-      .nav-links.open { display: flex; }
-      .hero h2 { font-size: 30px; }
+      .app-layout { flex-direction: column; }
+      .sidebar { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; padding: 15px; }
+      .sidebar .tool-item { padding: 10px 14px; font-size: 14px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ===== NAVIGATION ===== -->
-<nav class="navbar">
-  <div class="logo">Empire<span>AI</span> Studio</div>
-  <button class="hamburger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
-  <ul class="nav-links" id="navLinks">
-    <li><a class="active" onclick="showPage('home')">🏠 Home</a></li>
-    <li><a onclick="showPage('studio')">🎛️ Studio</a></li>
-    <li><a onclick="showPage('dashboard')">👤 Dashboard</a></li>
-    <li>
-      <span id="authButtons">
-        <button class="btn-nav-outline" onclick="openModal('login')">Login</button>
-        <button class="btn-nav" onclick="openModal('signup')">Sign Up</button>
-      </span>
-      <span id="userDisplay" style="display:none; color:#d4af37; font-weight:bold;">
-        👋 <span id="usernameDisplay"></span>
-        <button class="btn-nav-outline" onclick="logoutUser()" style="margin-left:10px; font-size:13px; padding:5px 15px;">Logout</button>
-      </span>
-    </li>
-  </ul>
-</nav>
-
-<!-- ===== MAIN ===== -->
-<main>
-
-<!-- HOME PAGE -->
-<div id="homePage">
-  <section class="hero">
-    <h2>Create Amazing <span class="highlight">AI Content</span></h2>
-    <p>Text-to-Video • Text-to-Audio • Text-to-Image • AI Chat • Voice • More</p>
-    <button class="btn" onclick="showPage('studio')">🚀 Open Studio</button>
-  </section>
-  <div class="features">
-    <div class="feature-card"><div class="icon">🎬</div><h3>Text-to-Video</h3><p>Generate videos from text</p></div>
-    <div class="feature-card"><div class="icon">🗣️</div><h3>Text-to-Audio</h3><p>Convert text to speech</p></div>
-    <div class="feature-card"><div class="icon">🖼️</div><h3>Text-to-Image</h3><p>Generate images from text</p></div>
-    <div class="feature-card"><div class="icon">🤖</div><h3>AI Chatbot</h3><p>Chat with AI</p></div>
-    <div class="feature-card"><div class="icon">🌍</div><h3>Translate</h3><p>Translate scripts</p></div>
-    <div class="feature-card"><div class="icon">🎨</div><h3>Video Effects</h3><p>Filters & editing</p></div>
+<!-- ========================================== -->
+<!-- ===== LOGIN PAGE ===== -->
+<!-- ========================================== -->
+<div id="loginPage">
+  <div class="login-container">
+    <h1>👑 Empire AI</h1>
+    <p class="sub">Login to access your studio</p>
+    <input type="text" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <input type="text" id="loginName" placeholder="Full Name" style="display:none;">
+    <button class="btn" id="loginBtn" onclick="handleLogin()">Login</button>
+    <span class="switch-link" id="switchLink" onclick="switchAuthMode()">Don't have account? Sign Up</span>
+    <div id="loginError" class="login-error"></div>
   </div>
 </div>
 
-<!-- ===== STUDIO PAGE ===== -->
-<div id="studioPage" class="studio-box">
-  <h3>🎛️ AI Studio</h3>
-  <p style="color:#999; text-align:center;">Login required to use all features</p>
+<!-- ========================================== -->
+<!-- ===== MAIN APP (Hidden until login) ===== -->
+<!-- ========================================== -->
+<div id="appContainer">
 
-  <input type="text" id="projectName" placeholder="Project name">
-  <select id="videoType">
-    <option>YouTube Short — 9:16</option>
-    <option>YouTube Video — 16:9</option>
-    <option>Instagram Reel — 9:16</option>
-  </select>
-  <textarea id="script" placeholder="Apni script likhein..."></textarea>
-
-  <!-- ===== TEXT-TO-AUDIO ===== -->
-  <div class="section-title">🗣️ Text-to-Audio</div>
-  <div class="voice-controls">
-    <label>🌍 Language:</label>
-    <select id="langSelect">
-      <option value="en-GB">English (UK)</option>
-      <option value="en-US">English (US)</option>
-      <option value="ur-PK">Urdu (اردو)</option>
-      <option value="hi-IN">Hindi (हिन्दी)</option>
-      <option value="ar-SA">Arabic (العربية)</option>
-      <option value="es-ES">Spanish</option>
-      <option value="fr-FR">French</option>
-      <option value="de-DE">German</option>
-      <option value="ja-JP">Japanese</option>
-    </select>
-    <label>🗣️ Voice:</label>
-    <select id="voiceSelect"><option value="">Default</option></select>
-    <label>🎭 Style:</label>
-    <select id="styleSelect">
-      <option value="normal">Normal</option>
-      <option value="poetry">Poetry</option>
-      <option value="sad">Sad</option>
-      <option value="casual">Casual</option>
-      <option value="excited">Excited</option>
-      <option value="robot">Robot</option>
-      <option value="deep">Deep Narrator</option>
-    </select>
-    <label>⏩ Speed: <span class="slider-value" id="rateValue">0.9</span></label>
-    <input type="range" id="rateSlider" min="0.1" max="3" step="0.1" value="0.9">
-    <label>🎵 Pitch: <span class="slider-value" id="pitchValue">1.0</span></label>
-    <input type="range" id="pitchSlider" min="0.5" max="2" step="0.1" value="1.0">
-    <div class="button-group">
-      <button class="btn btn-secondary btn-sm" onclick="speakScript()">🔊 Listen</button>
-      <button class="btn btn-secondary btn-sm" onclick="downloadVoice()">💾 Download MP3</button>
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <div class="logo">Empire<span>AI</span> Studio</div>
+    <div class="user-info">
+      <span>👋 <span class="name" id="displayName">User</span></span>
+      <button class="btn-logout" onclick="logoutUser()">Logout</button>
     </div>
-  </div>
+  </nav>
 
-  <!-- ===== TEXT-TO-IMAGE ===== -->
-  <div class="section-title">🖼️ Text-to-Image</div>
-  <div class="flex-row">
-    <input type="text" id="imagePrompt" placeholder="Describe image..." style="flex:1;">
-    <button class="btn btn-secondary btn-sm" onclick="generateImage()">✨ Generate</button>
-  </div>
-  <div id="imageResult" style="margin-top:10px;"></div>
+  <!-- LAYOUT -->
+  <div class="app-layout">
 
-  <!-- ===== TEXT-TO-VIDEO (Free) ===== -->
-  <div class="section-title">🎬 Text-to-Video</div>
-  <div style="color:#999; font-size:14px; margin-bottom:8px;">✅ No API key needed — completely free!</div>
-  <button class="btn btn-secondary btn-sm" onclick="generateFreeVideo()">🎬 Generate Video</button>
-  <div id="freeVideoResult" style="margin-top:10px;"></div>
-
-  <!-- ===== TRANSLATE ===== -->
-  <div class="section-title">🌍 Translate</div>
-  <div class="flex-row">
-    <select id="translateTarget" style="flex:1;">
-      <option value="en">English</option><option value="ur">Urdu</option><option value="hi">Hindi</option>
-      <option value="ar">Arabic</option><option value="es">Spanish</option><option value="fr">French</option>
-      <option value="de">German</option><option value="ja">Japanese</option><option value="zh">Chinese</option>
-    </select>
-    <button class="btn btn-secondary btn-sm" onclick="translateScript()">🔁 Translate</button>
-  </div>
-  <div id="translationResult" style="color:#d4af37; margin-top:10px;"></div>
-
-  <!-- ===== CAPTIONS ===== -->
-  <div class="section-title">📝 Captions</div>
-  <button class="btn btn-secondary btn-sm" onclick="showCaptions()">📝 Generate Captions</button>
-  <div id="captionsResult" style="margin-top:10px; background:#1a1a25; padding:15px; border-radius:10px; display:none;"></div>
-
-  <!-- ===== VIDEO UPLOAD + EFFECTS ===== -->
-  <div class="section-title">🎬 Video Upload + Effects</div>
-  <div class="flex-row">
-    <input type="file" id="videoUpload" accept="video/*" style="flex:1;">
-    <button class="btn btn-secondary btn-sm" onclick="applyFilter('grayscale')">⚫ Grayscale</button>
-    <button class="btn btn-secondary btn-sm" onclick="applyFilter('sepia')">🟫 Sepia</button>
-    <button class="btn btn-secondary btn-sm" onclick="applyFilter('brightness')">☀️ Bright</button>
-    <button class="btn btn-secondary btn-sm" onclick="downloadUploadedVideo()">💾 Download</button>
-  </div>
-  <div style="position:relative; width:100%; max-height:300px; background:#000; border-radius:12px; overflow:hidden; margin-top:10px;">
-    <video id="uploadedVideoPreview" controls style="width:100%; max-height:300px; display:none;"></video>
-    <canvas id="videoCanvas" style="display:none;"></canvas>
-  </div>
-
-  <!-- ===== AI CHATBOT ===== -->
-  <div class="section-title">🤖 AI Chatbot</div>
-  <div style="margin-bottom:8px;">
-    <input type="text" id="geminiKey" placeholder="Gemini API Key (free from ai.google.dev)" style="width:100%; padding:12px; border-radius:8px; background:#0e0e14; border:1px solid #444; color:white;">
-  </div>
-  <div style="max-height:250px; overflow-y:auto; background:#0e0e14; border-radius:12px; padding:10px; margin-bottom:10px;" id="chatContainer">
-    <div style="background:#1a1a2a; padding:10px; border-radius:8px; margin:5px 0;"><b>Bot:</b> Hi! Ask me anything.</div>
-  </div>
-  <div class="flex-row">
-    <input type="text" id="chatInput" placeholder="Type message..." style="flex:1;">
-    <button class="btn btn-secondary btn-sm" onclick="sendChat()">Send</button>
-  </div>
-
-  <p class="message" id="message"></p>
-  <button class="btn" onclick="startProject()">✅ Start Project</button>
-</div>
-
-<!-- ===== DASHBOARD ===== -->
-<div id="dashboardPage" class="dashboard">
-  <h3>👤 Dashboard</h3>
-  <div class="user-info">
-    <div class="avatar">👤</div>
-    <div>
-      <h4 id="dashboardUsername">User</h4>
-      <p style="color:#aaa;">Email: <span id="dashboardEmail">user@email.com</span></p>
+    <!-- SIDEBAR - TOOLS -->
+    <div class="sidebar" id="sidebar">
+      <div class="tool-item active" data-tool="dashboard" onclick="switchTool('dashboard')">
+        <span class="icon">📊</span> Dashboard
+      </div>
+      <div class="tool-item" data-tool="text-to-video" onclick="switchTool('text-to-video')">
+        <span class="icon">🎬</span> Text-to-Video
+      </div>
+      <div class="tool-item" data-tool="text-to-audio" onclick="switchTool('text-to-audio')">
+        <span class="icon">🗣️</span> Text-to-Audio
+      </div>
+      <div class="tool-item" data-tool="text-to-image" onclick="switchTool('text-to-image')">
+        <span class="icon">🖼️</span> Text-to-Image
+      </div>
+      <div class="tool-item" data-tool="ai-chat" onclick="switchTool('ai-chat')">
+        <span class="icon">🤖</span> AI Chat
+      </div>
+      <div class="tool-item" data-tool="translate" onclick="switchTool('translate')">
+        <span class="icon">🌍</span> Translate
+      </div>
+      <div class="tool-item" data-tool="captions" onclick="switchTool('captions')">
+        <span class="icon">📝</span> Captions
+      </div>
+      <div class="tool-item" data-tool="video-effects" onclick="switchTool('video-effects')">
+        <span class="icon">🎨</span> Video Effects
+      </div>
     </div>
-  </div>
-  <hr style="border-color:#333; margin:20px 0;">
-  <h4>📊 My Projects</h4>
-  <p style="color:#888;">Total projects: <span id="projectCount">0</span></p>
-  <button class="btn btn-secondary btn-sm" onclick="showPage('studio')">🎛️ Go to Studio</button>
-</div>
 
-</main>
+    <!-- PANEL -->
+    <div class="panel">
+      <div id="toolTitle"><h2>📊 Dashboard</h2></div>
 
-<footer style="text-align:center; color:#666; padding:20px; border-top:1px solid #222; margin-top:20px;">© 2026 Empire AI Studio Pro</footer>
+      <!-- ===== DASHBOARD ===== -->
+      <div class="tool-content active" id="tool-dashboard">
+        <h3>Welcome, <span id="dashName">User</span>! 👋</h3>
+        <p style="color:#999; margin-bottom:20px;">Select a tool from the left sidebar to get started.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:15px;">
+          <div style="background:#1a1a28; padding:20px; border-radius:12px; text-align:center; border:1px solid #333;">
+            <div style="font-size:30px;">🎬</div>
+            <h4>Text-to-Video</h4>
+            <p style="color:#888; font-size:14px;">Generate videos from text</p>
+          </div>
+          <div style="background:#1a1a28; padding:20px; border-radius:12px; text-align:center; border:1px solid #333;">
+            <div style="font-size:30px;">🗣️</div>
+            <h4>Text-to-Audio</h4>
+            <p style="color:#888; font-size:14px;">Convert text to speech</p>
+          </div>
+          <div style="background:#1a1a28; padding:20px; border-radius:12px; text-align:center; border:1px solid #333;">
+            <div style="font-size:30px;">🖼️</div>
+            <h4>Text-to-Image</h4>
+            <p style="color:#888; font-size:14px;">Generate images from text</p>
+          </div>
+          <div style="background:#1a1a28; padding:20px; border-radius:12px; text-align:center; border:1px solid #333;">
+            <div style="font-size:30px;">🤖</div>
+            <h4>AI Chat</h4>
+            <p style="color:#888; font-size:14px;">Chat with Gemini AI</p>
+          </div>
+        </div>
+      </div>
 
-<!-- ===== MODAL ===== -->
-<div class="modal" id="authModal">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <h2 id="modalTitle">Login</h2>
-    <input type="text" id="authEmail" placeholder="Email">
-    <input type="password" id="authPassword" placeholder="Password">
-    <input type="text" id="authName" placeholder="Full Name" style="display:none;">
-    <button class="btn" onclick="handleAuth()" id="authBtn">Login</button>
-    <span class="switch-link" onclick="switchAuthMode()" id="switchLink">Don't have account? Sign Up</span>
+      <!-- ===== TEXT-TO-VIDEO ===== -->
+      <div class="tool-content" id="tool-text-to-video">
+        <h3>🎬 Text-to-Video</h3>
+        <p style="color:#999; font-size:14px; margin-bottom:15px;">Generate a video from your script. Free, no API key needed.</p>
+        <textarea id="videoScript" placeholder="Enter your script... e.g. A robot dancing on Mars"></textarea>
+        <button class="btn" onclick="generateVideo()">🎬 Generate Video</button>
+        <div id="videoResult" class="result-box" style="display:none;"></div>
+        <div id="videoMessage" class="message"></div>
+      </div>
+
+      <!-- ===== TEXT-TO-AUDIO ===== -->
+      <div class="tool-content" id="tool-text-to-audio">
+        <h3>🗣️ Text-to-Audio</h3>
+        <p style="color:#999; font-size:14px; margin-bottom:15px;">Convert text to speech with custom voice settings.</p>
+        <textarea id="audioScript" placeholder="Enter text to speak..."></textarea>
+        <div style="background:#1a1a28; padding:15px; border-radius:12px; margin:10px 0;">
+          <label>🌍 Language:</label>
+          <select id="audioLang">
+            <option value="en-GB">English (UK)</option>
+            <option value="en-US">English (US)</option>
+            <option value="ur-PK">Urdu (اردو)</option>
+            <option value="hi-IN">Hindi (हिन्दी)</option>
+            <option value="ar-SA">Arabic (العربية)</option>
+            <option value="es-ES">Spanish</option>
+            <option value="fr-FR">French</option>
+          </select>
+          <label>🎭 Style:</label>
+          <select id="audioStyle">
+            <option value="normal">Normal</option>
+            <option value="poetry">Poetry (Slow)</option>
+            <option value="sad">Sad (Slow & Low)</option>
+            <option value="excited">Excited (Fast & High)</option>
+            <option value="robot">Robot</option>
+          </select>
+          <label>⏩ Speed: <span id="audioRateVal">0.9</span></label>
+          <input type="range" id="audioRate" min="0.1" max="3" step="0.1" value="0.9" style="width:100%;">
+          <label>🎵 Pitch: <span id="audioPitchVal">1.0</span></label>
+          <input type="range" id="audioPitch" min="0.5" max="2" step="0.1" value="1.0" style="width:100%;">
+        </div>
+        <div class="btn-group">
+          <button class="btn" onclick="speakAudio()">🔊 Listen</button>
+          <button class="btn btn-secondary" onclick="downloadAudio()">💾 Download MP3</button>
+        </div>
+        <div id="audioMessage" class="message"></div>
+      </div>
+
+      <!-- ===== TEXT-TO-IMAGE ===== -->
+      <div class="tool-content" id="tool-text-to-image">
+        <h3>🖼️ Text-to-Image</h3>
+        <p style="color:#999; font-size:14px; margin-bottom:15px;">Generate images from text descriptions. Free, no API key.</p>
+        <div class="flex-row">
+          <input type="text" id="imagePrompt" placeholder="Describe image..." style="flex:1;">
+          <button class="btn" onclick="generateImage()">✨ Generate</button>
+        </div>
+        <div id="imageResult" class="result-box" style="display:none;"></div>
+        <div id="imageMessage" class="message"></div>
+      </div>
+
+      <!-- ===== AI CHAT ===== -->
+      <div class="tool-content" id="tool-ai-chat">
+        <h3>🤖 AI Chat</h3>
+        <p style="color:#999; font-size:14px; margin-bottom:15px;">Chat with Gemini AI. Enter your free API key below.</p>
+        <input type="text" id="chatKey" placeholder="Gemini API Key (free from ai.google.dev)">
+        <div style="max-height:300px; overflow-y:auto; background:#0e0e14; border-radius:12px; padding:15px; margin-bottom:10px;" id="chatContainer">
+          <div style="background:#1a1a2a; padding:12px; border-radius:10px; margin:5px 0;"><b>Bot:</b> Hi! Ask me anything.</div>
+        </div>
+        <div class="flex-row">
+          <input type="text" id="chatInput" placeholder="Type message..." style="flex:1;">
+          <button class="btn" onclick="sendChatMessage()">Send</button>
+        </div>
+        <div id="chatMessage" class="message"></div>
+      </div>
+
+      <!-- ===== TRANSLATE ===== -->
+      <div class="tool-content" id="tool-translate">
+        <h3>🌍 Translate</h3>
+        <p style="color:#999; font-size:14px; margin-bottom:15px;">Translate your script to any language.</p>
+        <textarea id="translateScript" placeholder="Enter text to translate..."></textarea>
+        <div class="flex-row">
+          <select id="translateTarget" style="flex:1;">
+            <option value="en">English</option>
+            <option value="ur">Urdu (اردو)</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="ar">Arabic (العربية)</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="ja">Japanese</option>
+            <option value="zh">Chinese</option>
+          </select>
+          <button class="btn" onclick="translateText()">🔁 Translate</button>
+        </div>
+        <div id="translateResult" class="result-box" style="display:none;"></div>
+        <div id="translateMessage" class="message"></div>
+      </div>
+
+      <!-- ===== CAPTIONS ===== -->
+      <div class="tool-content" id="tool-captions">
+        <h3>📝 Captions</h3>
+        <p style="color:#999; font-size:14px; margin-bottom:15px;">Generate captions from your script.</p>
+        <textarea id="captionsScript" placeholder="Enter script for captions..."></textarea>
+        <button class="btn" onclick="generateCaptions()">📝 Generate Captions</button>
+        <div id="captionsResult" class="result-box" style="display:none;"></div>
+        <div id="captionsMessage" class="message"></div>
+      </div>
+
+      <!-- ===== VIDEO EFFECTS ===== -->
+      <div class="tool-content" id="tool-video-effects">
+        <h3>🎨 Video Effects</h3>
+        <p style="color:#999; font-size:14px; margin-bottom:15px;">Upload video and apply filters.</p>
+        <input type="file" id="effectVideo" accept="video/*">
+        <div class="btn-group">
+          <button class="btn btn-secondary" onclick="applyVideoFilter('grayscale')">⚫ Grayscale</button>
+          <button class="btn btn-secondary" onclick="applyVideoFilter('sepia')">🟫 Sepia</button>
+          <button class="btn btn-secondary" onclick="applyVideoFilter('brightness')">☀️ Bright</button>
+          <button class="btn btn-secondary" onclick="applyVideoFilter('none')">🔄 Reset</button>
+          <button class="btn" onclick="downloadEffectVideo()">💾 Download</button>
+        </div>
+        <div style="position:relative; width:100%; max-height:400px; background:#000; border-radius:12px; overflow:hidden; margin-top:10px;">
+          <video id="effectVideoPreview" controls style="width:100%; max-height:400px; display:none;"></video>
+          <canvas id="effectCanvas" style="display:none;"></canvas>
+        </div>
+        <div id="effectMessage" class="message"></div>
+      </div>
+
+    </div>
   </div>
 </div>
 
