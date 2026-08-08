@@ -76,7 +76,7 @@ app.post('/api/generate-video', async (req, res) => {
 });
 
 // =============================================
-// API: CHAT (Gemini 1.5 Flash Standard Model)
+// API: CHAT (Gemini 1.5 Flash + Timeout Fix)
 // =============================================
 app.post('/api/chat', async (req, res) => {
   const { message } = req.body;
@@ -89,6 +89,9 @@ app.post('/api/chat', async (req, res) => {
   }
 
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -96,17 +99,24 @@ app.post('/api/chat', async (req, res) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: message }] }]
-        })
+        }),
+        signal: controller.signal
       }
     );
+    clearTimeout(timeoutId);
+
     const data = await response.json();
-    
-    // Exact response extraction
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.error?.message || 'No reply';
+
+    if (data.error) {
+      return res.status(400).json({ reply: `API Error: ${data.error.message}` });
+    }
+
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No response text';
     res.json({ reply });
+
   } catch (error) {
     console.error('Chat error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ reply: `Network Error: ${error.message}` });
   }
 });
 
@@ -139,4 +149,4 @@ const PORT = process.env.PORT || process.env.EXPOSE_PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
-      
+    
