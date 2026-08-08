@@ -3,13 +3,13 @@ const app = express();
 app.use(express.json());
 
 // =============================================
-// API KEYS (Environment Variables se lein)
+// API KEYS (Environment Variables)
 // =============================================
 const FAL_API_KEY = process.env.FAL_API_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 // =============================================
-// CORS (Frontend ko access dene ke liye)
+// CORS
 // =============================================
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 });
 
 // =============================================
-// HEALTH CHECKS (Pxxl Probe Fail Honay Se Bachane Ke Liye)
+// HEALTH CHECKS
 // =============================================
 app.get('/', (req, res) => {
   res.status(200).send('OK');
@@ -42,7 +42,6 @@ app.post('/api/generate-video', async (req, res) => {
   }
 
   try {
-    // Agar FAL_API_KEY available hai toh use karein
     if (FAL_API_KEY) {
       const response = await fetch('https://fal.run/fal-ai/wan/v2', {
         method: 'POST',
@@ -65,7 +64,7 @@ app.post('/api/generate-video', async (req, res) => {
       }
     }
 
-    // Fallback: Pollinations.ai (free, no key)
+    // Fallback URL (Pollinations)
     const prompt = encodeURIComponent(script);
     const videoUrl = `https://image.pollinations.ai/prompt/${prompt}?width=1280&height=720&nologo=true`;
     res.json({ videoUrl });
@@ -77,7 +76,7 @@ app.post('/api/generate-video', async (req, res) => {
 });
 
 // =============================================
-// API: CHAT (Gemini)
+// API: CHAT (Gemini 1.5 Flash Standard Model)
 // =============================================
 app.post('/api/chat', async (req, res) => {
   const { message } = req.body;
@@ -91,7 +90,7 @@ app.post('/api/chat', async (req, res) => {
 
   try {
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -101,7 +100,9 @@ app.post('/api/chat', async (req, res) => {
       }
     );
     const data = await response.json();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No reply';
+    
+    // Exact response extraction
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || data?.error?.message || 'No reply';
     res.json({ reply });
   } catch (error) {
     console.error('Chat error:', error);
@@ -132,10 +133,10 @@ app.post('/api/translate', async (req, res) => {
 });
 
 // =============================================
-// SERVER START (Fixed Port & Host Binding)
+// SERVER START
 // =============================================
 const PORT = process.env.PORT || process.env.EXPOSE_PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
-  
+      
