@@ -1,5 +1,111 @@
 // =============================================
-// 1. LOGIN / AUTH (Fixed)
+// 1. LANGUAGES LIST (50+)
+// =============================================
+const LANGUAGES = [
+  { code: 'af-ZA', name: 'Afrikaans' },
+  { code: 'sq-AL', name: 'Albanian' },
+  { code: 'am-ET', name: 'Amharic' },
+  { code: 'ar-SA', name: 'Arabic' },
+  { code: 'hy-AM', name: 'Armenian' },
+  { code: 'az-AZ', name: 'Azerbaijani' },
+  { code: 'eu-ES', name: 'Basque' },
+  { code: 'be-BY', name: 'Belarusian' },
+  { code: 'bn-BD', name: 'Bengali' },
+  { code: 'bs-BA', name: 'Bosnian' },
+  { code: 'bg-BG', name: 'Bulgarian' },
+  { code: 'ca-ES', name: 'Catalan' },
+  { code: 'ceb-PH', name: 'Cebuano' },
+  { code: 'zh-CN', name: 'Chinese' },
+  { code: 'hr-HR', name: 'Croatian' },
+  { code: 'cs-CZ', name: 'Czech' },
+  { code: 'da-DK', name: 'Danish' },
+  { code: 'nl-NL', name: 'Dutch' },
+  { code: 'en-US', name: 'English (US)' },
+  { code: 'en-GB', name: 'English (UK)' },
+  { code: 'eo-EO', name: 'Esperanto' },
+  { code: 'et-EE', name: 'Estonian' },
+  { code: 'fil-PH', name: 'Filipino' },
+  { code: 'fi-FI', name: 'Finnish' },
+  { code: 'fr-FR', name: 'French' },
+  { code: 'gl-ES', name: 'Galician' },
+  { code: 'ka-GE', name: 'Georgian' },
+  { code: 'de-DE', name: 'German' },
+  { code: 'el-GR', name: 'Greek' },
+  { code: 'gu-IN', name: 'Gujarati' },
+  { code: 'he-IL', name: 'Hebrew' },
+  { code: 'hi-IN', name: 'Hindi' },
+  { code: 'hu-HU', name: 'Hungarian' },
+  { code: 'is-IS', name: 'Icelandic' },
+  { code: 'id-ID', name: 'Indonesian' },
+  { code: 'ga-IE', name: 'Irish' },
+  { code: 'it-IT', name: 'Italian' },
+  { code: 'ja-JP', name: 'Japanese' },
+  { code: 'jv-ID', name: 'Javanese' },
+  { code: 'kn-IN', name: 'Kannada' },
+  { code: 'kk-KZ', name: 'Kazakh' },
+  { code: 'km-KH', name: 'Khmer' },
+  { code: 'ko-KR', name: 'Korean' },
+  { code: 'lo-LA', name: 'Lao' },
+  { code: 'lv-LV', name: 'Latvian' },
+  { code: 'lt-LT', name: 'Lithuanian' },
+  { code: 'mk-MK', name: 'Macedonian' },
+  { code: 'ms-MY', name: 'Malay' },
+  { code: 'ml-IN', name: 'Malayalam' },
+  { code: 'mt-MT', name: 'Maltese' },
+  { code: 'mr-IN', name: 'Marathi' },
+  { code: 'mn-MN', name: 'Mongolian' },
+  { code: 'ne-NP', name: 'Nepali' },
+  { code: 'no-NO', name: 'Norwegian' },
+  { code: 'fa-IR', name: 'Persian' },
+  { code: 'pl-PL', name: 'Polish' },
+  { code: 'pt-PT', name: 'Portuguese' },
+  { code: 'pa-IN', name: 'Punjabi' },
+  { code: 'ro-RO', name: 'Romanian' },
+  { code: 'ru-RU', name: 'Russian' },
+  { code: 'sr-RS', name: 'Serbian' },
+  { code: 'si-LK', name: 'Sinhala' },
+  { code: 'sk-SK', name: 'Slovak' },
+  { code: 'sl-SI', name: 'Slovenian' },
+  { code: 'so-SO', name: 'Somali' },
+  { code: 'es-ES', name: 'Spanish' },
+  { code: 'su-ID', name: 'Sundanese' },
+  { code: 'sw-KE', name: 'Swahili' },
+  { code: 'sv-SE', name: 'Swedish' },
+  { code: 'ta-IN', name: 'Tamil' },
+  { code: 'te-IN', name: 'Telugu' },
+  { code: 'th-TH', name: 'Thai' },
+  { code: 'tr-TR', name: 'Turkish' },
+  { code: 'uk-UA', name: 'Ukrainian' },
+  { code: 'ur-PK', name: 'Urdu' },
+  { code: 'uz-UZ', name: 'Uzbek' },
+  { code: 'vi-VN', name: 'Vietnamese' },
+  { code: 'cy-GB', name: 'Welsh' },
+  { code: 'xh-ZA', name: 'Xhosa' },
+  { code: 'yo-NG', name: 'Yoruba' },
+  { code: 'zu-ZA', name: 'Zulu' }
+];
+
+// =============================================
+// 2. POPULATE LANGUAGE DROPDOWNS
+// =============================================
+function populateLanguages() {
+  const selects = ['audioLang', 'dubLang', 'transTarget', 'capLang'];
+  selects.forEach(id => {
+    const select = document.getElementById(id);
+    if (select) {
+      select.innerHTML = '';
+      LANGUAGES.forEach(lang => {
+        const opt = document.createElement('option');
+        opt.value = lang.code;
+        opt.textContent = lang.name;
+        select.appendChild(opt);
+      });
+    }
+  });
+}
+
+// =============================================
+// 3. LOGIN / AUTH
 // =============================================
 let currentUser = null;
 let isLogin = true;
@@ -36,7 +142,6 @@ function handleLogin() {
       document.getElementById('loginError').textContent = '';
       showApp();
     } else {
-      // Auto-create account if not exists
       const newUser = { email, pass, name: name || email.split('@')[0], projects: [], stats: { videos: 0, images: 0, audio: 0 } };
       users.push(newUser);
       localStorage.setItem('users', JSON.stringify(users));
@@ -66,6 +171,7 @@ function showApp() {
   document.getElementById('displayName').textContent = currentUser.name || currentUser.email;
   document.getElementById('dashName').textContent = currentUser.name || currentUser.email;
   updateDashboard();
+  populateLanguages();
 }
 
 function logout() {
@@ -91,7 +197,7 @@ document.addEventListener('keydown', e => {
 });
 
 // =============================================
-// 2. TOOL SWITCHING
+// 4. TOOL SWITCHING
 // =============================================
 function switchTool(tool) {
   document.querySelectorAll('.sidebar .tool').forEach(el => el.classList.remove('active'));
@@ -104,6 +210,8 @@ function switchTool(tool) {
     video: '🎬 Text→Video',
     audio: '🗣️ Text→Audio',
     image: '🖼️ Text→Image',
+    dubbing: '🔊 Voice Dubbing',
+    clone: '🎭 Voice Clone',
     chat: '🤖 AI Chat',
     translate: '🌍 Translate',
     captions: '📝 Captions',
@@ -115,7 +223,7 @@ function switchTool(tool) {
 }
 
 // =============================================
-// 3. DASHBOARD
+// 5. DASHBOARD
 // =============================================
 function updateDashboard() {
   if (!currentUser) return;
@@ -130,7 +238,7 @@ function updateDashboard() {
   const container = document.getElementById('recentProjects');
   container.innerHTML = '';
   if (recent.length === 0) {
-    container.innerHTML = '<p style="color:#666;">No projects yet. Create your first project!</p>';
+    container.innerHTML = '<p style="color:#666;">No projects yet.</p>';
   } else {
     recent.forEach(p => {
       const card = document.createElement('div');
@@ -139,7 +247,7 @@ function updateDashboard() {
         <h4>${p.name}</h4>
         <p style="color:#888; font-size:13px;">${p.type} • ${p.date || 'Today'}</p>
         <div class="actions">
-          <button class="btn-view" onclick="alert('Open project: ${p.name}')">Open</button>
+          <button class="btn-view" onclick="alert('Open: ${p.name}')">Open</button>
           <button class="btn-del" onclick="deleteProject('${p.id}')">Delete</button>
         </div>
       `;
@@ -149,7 +257,7 @@ function updateDashboard() {
 }
 
 // =============================================
-// 4. PROJECT MANAGER
+// 6. PROJECT MANAGER
 // =============================================
 function createProject() {
   const name = document.getElementById('projectNameInput').value.trim();
@@ -177,7 +285,7 @@ function renderProjects() {
   const projects = currentUser?.projects || [];
   container.innerHTML = '';
   if (projects.length === 0) {
-    container.innerHTML = '<p style="color:#666;">No projects yet. Create your first project above!</p>';
+    container.innerHTML = '<p style="color:#666;">No projects yet.</p>';
     return;
   }
   const sorted = [...projects].reverse();
@@ -211,7 +319,7 @@ function deleteProject(id) {
   saveUser();
   renderProjects();
   updateDashboard();
-  document.getElementById('projectMsg').textContent = '🗑️ Project deleted.';
+  document.getElementById('projectMsg').textContent = '🗑️ Deleted.';
 }
 
 function saveUser() {
@@ -224,7 +332,7 @@ function saveUser() {
 }
 
 // =============================================
-// 5. TEXT→VIDEO
+// 7. TEXT→VIDEO
 // =============================================
 async function genVideo() {
   const s = document.getElementById('videoScript').value.trim();
@@ -235,13 +343,15 @@ async function genVideo() {
   try {
     const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(s)}?width=1280&height=720&nologo=true`;
     r.innerHTML = `<video controls style="width:100%; max-height:250px; border-radius:8px;"><source src="${url}" type="video/mp4"></video>`;
+    document.getElementById('videoCaptions').style.display = 'block';
+    document.getElementById('videoCaptions').innerHTML = '📝 ' + s;
     document.getElementById('videoMsg').textContent = '✅ Video ready!';
     if (currentUser) { currentUser.stats = currentUser.stats || {}; currentUser.stats.videos = (currentUser.stats.videos || 0) + 1; saveUser(); updateDashboard(); }
   } catch(e) { r.innerHTML = '❌ Error'; document.getElementById('videoMsg').textContent = '❌ Failed.'; }
 }
 
 // =============================================
-// 6. TEXT→AUDIO
+// 8. TEXT→AUDIO (50+ Languages, 15+ Styles, Gender, Age)
 // =============================================
 let audioRec, audioChunks = [];
 
@@ -252,11 +362,36 @@ function speakAudio() {
   const u = new SpeechSynthesisUtterance(t);
   u.lang = document.getElementById('audioLang').value;
   u.rate = parseFloat(document.getElementById('audioRate').value);
+  
+  const gender = document.getElementById('audioGender').value;
+  const age = document.getElementById('audioAge').value;
   const style = document.getElementById('audioStyle').value;
-  if (style === 'poetry') { u.rate = 0.6; u.pitch = 1.1; }
-  else if (style === 'sad') { u.rate = 0.5; u.pitch = 0.8; }
-  else if (style === 'excited') { u.rate = 1.4; u.pitch = 1.3; }
-  u.onstart = () => document.getElementById('audioMsg').textContent = '🎙️ Playing...';
+  
+  // Gender + Age adjustments (pitch)
+  let pitch = 1.0;
+  if (gender === 'male') pitch = 0.85;
+  else if (gender === 'female') pitch = 1.2;
+  if (age === 'young') pitch *= 1.1;
+  else if (age === 'old') pitch *= 0.8;
+  
+  // Style adjustments
+  if (style === 'neutral') { u.rate = 0.9; u.pitch = pitch; }
+  else if (style === 'poetry') { u.rate = 0.6; u.pitch = pitch * 1.1; }
+  else if (style === 'sad') { u.rate = 0.5; u.pitch = pitch * 0.8; }
+  else if (style === 'excited') { u.rate = 1.4; u.pitch = pitch * 1.3; }
+  else if (style === 'robot') { u.rate = 1.0; u.pitch = 0.5; }
+  else if (style === 'dramatic') { u.rate = 0.7; u.pitch = pitch * 1.2; }
+  else if (style === 'horror') { u.rate = 0.4; u.pitch = pitch * 0.6; }
+  else if (style === 'cartoon') { u.rate = 1.3; u.pitch = pitch * 1.8; }
+  else if (style === 'deep') { u.rate = 0.6; u.pitch = pitch * 0.6; }
+  else if (style === 'whisper') { u.rate = 0.3; u.pitch = pitch * 0.7; }
+  else if (style === 'cheerful') { u.rate = 1.2; u.pitch = pitch * 1.2; }
+  else if (style === 'grumpy') { u.rate = 0.6; u.pitch = pitch * 0.7; }
+  else if (style === 'formal') { u.rate = 0.8; u.pitch = pitch * 0.9; }
+  else if (style === 'casual') { u.rate = 1.1; u.pitch = pitch * 1.0; }
+  else if (style === 'narrator') { u.rate = 0.75; u.pitch = pitch * 0.9; }
+  
+  u.onstart = () => document.getElementById('audioMsg').textContent = `🎙️ ${gender}/${age} - ${style}...`;
   u.onend = () => {
     document.getElementById('audioMsg').textContent = '✅ Done!';
     if (currentUser) { currentUser.stats = currentUser.stats || {}; currentUser.stats.audio = (currentUser.stats.audio || 0) + 1; saveUser(); updateDashboard(); }
@@ -271,6 +406,33 @@ function downloadAudio() {
   const u = new SpeechSynthesisUtterance(t);
   u.lang = document.getElementById('audioLang').value;
   u.rate = parseFloat(document.getElementById('audioRate').value);
+  
+  const gender = document.getElementById('audioGender').value;
+  const age = document.getElementById('audioAge').value;
+  const style = document.getElementById('audioStyle').value;
+  
+  let pitch = 1.0;
+  if (gender === 'male') pitch = 0.85;
+  else if (gender === 'female') pitch = 1.2;
+  if (age === 'young') pitch *= 1.1;
+  else if (age === 'old') pitch *= 0.8;
+  
+  if (style === 'neutral') { u.rate = 0.9; u.pitch = pitch; }
+  else if (style === 'poetry') { u.rate = 0.6; u.pitch = pitch * 1.1; }
+  else if (style === 'sad') { u.rate = 0.5; u.pitch = pitch * 0.8; }
+  else if (style === 'excited') { u.rate = 1.4; u.pitch = pitch * 1.3; }
+  else if (style === 'robot') { u.rate = 1.0; u.pitch = 0.5; }
+  else if (style === 'dramatic') { u.rate = 0.7; u.pitch = pitch * 1.2; }
+  else if (style === 'horror') { u.rate = 0.4; u.pitch = pitch * 0.6; }
+  else if (style === 'cartoon') { u.rate = 1.3; u.pitch = pitch * 1.8; }
+  else if (style === 'deep') { u.rate = 0.6; u.pitch = pitch * 0.6; }
+  else if (style === 'whisper') { u.rate = 0.3; u.pitch = pitch * 0.7; }
+  else if (style === 'cheerful') { u.rate = 1.2; u.pitch = pitch * 1.2; }
+  else if (style === 'grumpy') { u.rate = 0.6; u.pitch = pitch * 0.7; }
+  else if (style === 'formal') { u.rate = 0.8; u.pitch = pitch * 0.9; }
+  else if (style === 'casual') { u.rate = 1.1; u.pitch = pitch * 1.0; }
+  else if (style === 'narrator') { u.rate = 0.75; u.pitch = pitch * 0.9; }
+  
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const dest = ctx.createMediaStreamDestination();
   audioRec = new MediaRecorder(dest.stream);
@@ -291,7 +453,7 @@ function downloadAudio() {
 }
 
 // =============================================
-// 7. TEXT→IMAGE
+// 9. TEXT→IMAGE
 // =============================================
 function genImage() {
   const p = document.getElementById('imagePrompt').value.trim();
@@ -304,7 +466,55 @@ function genImage() {
 }
 
 // =============================================
-// 8. AI CHAT
+// 10. DUBBING (50+ Languages)
+// =============================================
+async function dubVideo() {
+  const file = document.getElementById('dubVideo').files[0];
+  if (!file) { document.getElementById('dubMsg').textContent = '⚠️ Upload video!'; return; }
+  document.getElementById('dubMsg').textContent = '⏳ Processing...';
+  
+  const script = document.getElementById('videoScript').value.trim() || 'Hello, this is a test';
+  const target = document.getElementById('dubLang').value;
+  
+  try {
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${target.split('-')[0]}&dt=t&q=${encodeURIComponent(script)}`);
+    const data = await res.json();
+    const translated = data[0][0][0];
+    
+    const utterance = new SpeechSynthesisUtterance(translated);
+    utterance.lang = target;
+    utterance.rate = 0.9;
+    utterance.onstart = () => document.getElementById('dubMsg').textContent = '🔊 Playing dubbed voice...';
+    utterance.onend = () => {
+      document.getElementById('dubMsg').textContent = '✅ Dubbing complete!';
+      document.getElementById('dubResult').style.display = 'block';
+      document.getElementById('dubResult').innerHTML = `🌐 Translated: ${translated}`;
+    };
+    window.speechSynthesis.speak(utterance);
+  } catch(e) {
+    document.getElementById('dubMsg').textContent = '❌ Error: ' + e.message;
+  }
+}
+
+// =============================================
+// 11. VOICE CLONE
+// =============================================
+async function cloneVoice() {
+  const file = document.getElementById('cloneAudio').files[0];
+  if (!file) { document.getElementById('cloneMsg').textContent = '⚠️ Upload audio sample!'; return; }
+  document.getElementById('cloneMsg').textContent = '⏳ Processing voice clone... (demo)';
+  
+  const script = document.getElementById('audioScript').value.trim() || 'Hello, this is your cloned voice!';
+  const utterance = new SpeechSynthesisUtterance(script);
+  utterance.rate = 0.85;
+  utterance.pitch = 0.95;
+  utterance.onstart = () => document.getElementById('cloneMsg').textContent = '🔊 Playing cloned voice...';
+  utterance.onend = () => document.getElementById('cloneMsg').textContent = '✅ Voice clone demo complete!';
+  window.speechSynthesis.speak(utterance);
+}
+
+// =============================================
+// 12. AI CHAT
 // =============================================
 async function sendChat() {
   const inp = document.getElementById('chatInput');
@@ -329,7 +539,7 @@ async function sendChat() {
 document.getElementById('chatInput').addEventListener('keyup', e => { if (e.key === 'Enter') sendChat(); });
 
 // =============================================
-// 9. TRANSLATE
+// 13. TRANSLATE (50+ Languages)
 // =============================================
 async function doTranslate() {
   const t = document.getElementById('transScript').value.trim();
@@ -339,7 +549,7 @@ async function doTranslate() {
   r.style.display = 'block';
   document.getElementById('transMsg').textContent = '⏳ Translating...';
   try {
-    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(t)}`);
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target.split('-')[0]}&dt=t&q=${encodeURIComponent(t)}`);
     const data = await res.json();
     r.innerHTML = data[0][0][0];
     document.getElementById('transMsg').textContent = '✅ Done!';
@@ -347,19 +557,21 @@ async function doTranslate() {
 }
 
 // =============================================
-// 10. CAPTIONS
+// 14. CAPTIONS (50+ Languages)
 // =============================================
 function genCaptions() {
   const s = document.getElementById('capScript').value.trim();
   if (!s) { document.getElementById('capMsg').textContent = '⚠️ Enter script!'; return; }
   const r = document.getElementById('capResult');
   r.style.display = 'block';
-  r.innerHTML = '📝 ' + s;
+  const lang = document.getElementById('capLang').value;
+  const langName = LANGUAGES.find(l => l.code === lang)?.name || 'English';
+  r.innerHTML = `📝 ${s}<br><span style="color:#888; font-size:12px;">Language: ${langName}</span>`;
   document.getElementById('capMsg').textContent = '✅ Captions ready!';
 }
 
 // =============================================
-// 11. EFFECTS
+// 15. EFFECTS
 // =============================================
 document.getElementById('effectFile').addEventListener('change', function(e) {
   const file = e.target.files[0];
@@ -417,10 +629,10 @@ function downloadEffect() {
 }
 
 // =============================================
-// 12. SLIDERS
+// 16. SLIDERS
 // =============================================
 function setupSliders() {
   const r = document.getElementById('audioRate');
   const rv = document.getElementById('rateVal');
   if (r && rv) r.addEventListener('input', () => rv.textContent = r.value);
-        }
+}
