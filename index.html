@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Empire AI Studio</title>
+  <title>Empire AI Studio Pro</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
     body { background: #0b0b0f; color: white; min-height: 100vh; }
@@ -85,9 +85,7 @@
 
     /* ===== PROJECT CARDS ===== */
     .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-top: 15px; }
-    .project-card {
-      background: #1a1a28; padding: 18px; border-radius: 12px; border: 1px solid #333; transition: 0.3s;
-    }
+    .project-card { background: #1a1a28; padding: 18px; border-radius: 12px; border: 1px solid #333; transition: 0.3s; }
     .project-card:hover { border-color: #d4af37; transform: translateY(-3px); }
     .project-card h4 { color: #d4af37; }
     .project-card .date { color: #666; font-size: 12px; }
@@ -101,6 +99,10 @@
     .stat-card { background: #1a1a28; padding: 20px; border-radius: 12px; text-align: center; border: 1px solid #333; }
     .stat-card .num { font-size: 32px; color: #d4af37; font-weight: bold; }
     .stat-card .label { color: #888; font-size: 14px; }
+
+    .voice-settings { background: #1a1a28; padding: 15px; border-radius: 12px; margin: 10px 0; border: 1px solid #333; }
+    .voice-settings label { color: #ccc; display: block; margin-top: 8px; font-size: 14px; }
+    .voice-settings select { margin-bottom: 6px; }
 
     @media (max-width: 700px) {
       .layout { flex-direction: column; }
@@ -130,7 +132,7 @@
 
   <!-- NAV -->
   <nav class="nav">
-    <div class="logo">Empire AI Studio</div>
+    <div class="logo">Empire AI Studio Pro</div>
     <div class="user">
       <span>👋 <span class="name" id="displayName">User</span></span>
       <button class="btn-logout" onclick="logout()">Logout</button>
@@ -147,7 +149,9 @@
       <div class="tool" data-tool="video" onclick="switchTool('video')">🎬 Text→Video</div>
       <div class="tool" data-tool="audio" onclick="switchTool('audio')">🗣️ Text→Audio</div>
       <div class="tool" data-tool="image" onclick="switchTool('image')">🖼️ Text→Image</div>
-      <div class="tool" data-tool="chat" onclick="switchTool('chat')">🤖 AI Chat</div>
+      <div class="tool" data-tool="dubbing" onclick="switchTool('dubbing')">🔊 Dubbing</div>
+      <div class="tool" data-tool="clone" onclick="switchTool('clone')">🎭 Clone</div>
+      <div class="tool" data-tool="chat" onclick="switchTool('chat')">🤖 Chat</div>
       <div class="tool" data-tool="translate" onclick="switchTool('translate')">🌍 Translate</div>
       <div class="tool" data-tool="captions" onclick="switchTool('captions')">📝 Captions</div>
       <div class="tool" data-tool="effects" onclick="switchTool('effects')">🎨 Effects</div>
@@ -160,28 +164,21 @@
       <!-- ===== DASHBOARD ===== -->
       <div class="content active" id="content-dashboard">
         <h3>Welcome, <span id="dashName">User</span>! 👋</h3>
-        <p style="color:#999;">Here's your studio overview</p>
-
+        <p style="color:#999;">Your all-in-one AI studio with 50+ languages, 15+ styles, gender & age control</p>
         <div class="stats">
-          <div class="stat-card"><div class="num" id="statProjects">0</div><div class="label">Total Projects</div></div>
-          <div class="stat-card"><div class="num" id="statVideos">0</div><div class="label">Videos Generated</div></div>
-          <div class="stat-card"><div class="num" id="statImages">0</div><div class="label">Images Generated</div></div>
-          <div class="stat-card"><div class="num" id="statAudio">0</div><div class="label">Audio Generated</div></div>
+          <div class="stat-card"><div class="num" id="statProjects">0</div><div class="label">Projects</div></div>
+          <div class="stat-card"><div class="num" id="statVideos">0</div><div class="label">Videos</div></div>
+          <div class="stat-card"><div class="num" id="statImages">0</div><div class="label">Images</div></div>
+          <div class="stat-card"><div class="num" id="statAudio">0</div><div class="label">Audio</div></div>
         </div>
-
         <h4 style="margin:20px 0 10px; color:#d4af37;">📁 Recent Projects</h4>
         <div id="recentProjects" class="project-grid"></div>
-
-        <div style="margin-top:15px;">
-          <button class="btn" onclick="switchTool('projects')">📁 View All Projects</button>
-        </div>
+        <div style="margin-top:15px;"><button class="btn" onclick="switchTool('projects')">📁 View All</button></div>
       </div>
 
       <!-- ===== PROJECTS ===== -->
       <div class="content" id="content-projects">
         <h3>📁 Project Manager</h3>
-        <p style="color:#999; font-size:14px;">Create, save and manage your projects</p>
-
         <div style="background:#1a1a28; padding:15px; border-radius:12px; margin:15px 0;">
           <h4 style="color:#d4af37;">+ New Project</h4>
           <div class="flex">
@@ -196,7 +193,6 @@
             <button class="btn" onclick="createProject()">+ Create</button>
           </div>
         </div>
-
         <div id="projectList" class="project-grid"></div>
         <div id="projectMsg" class="msg"></div>
       </div>
@@ -208,32 +204,60 @@
         <textarea id="videoScript" placeholder="Script... e.g. A robot dancing on Mars"></textarea>
         <button class="btn" onclick="genVideo()">🎬 Generate</button>
         <div class="result" id="videoResult"></div>
+        <div id="videoCaptions" style="background:#1a1a28; padding:15px; border-radius:10px; margin-top:10px; color:#d4af37; display:none;"></div>
         <div class="msg" id="videoMsg"></div>
       </div>
 
       <!-- ===== TEXT→AUDIO ===== -->
       <div class="content" id="content-audio">
         <h3>🗣️ Text→Audio</h3>
+        <p style="color:#999; font-size:14px;">50+ Languages • 15+ Styles • Gender • Age Control</p>
         <textarea id="audioScript" placeholder="Text to speak..."></textarea>
-        <div style="background:#1a1a28; padding:12px; border-radius:10px; margin:10px 0;">
-          <select id="audioLang">
-            <option value="en-GB">English (UK)</option>
-            <option value="ur-PK">Urdu</option>
-            <option value="hi-IN">Hindi</option>
-            <option value="ar-SA">Arabic</option>
+        
+        <div class="voice-settings">
+          <label>🌍 Language (50+):</label>
+          <select id="audioLang"></select>
+          
+          <label>🗣️ Gender:</label>
+          <select id="audioGender">
+            <option value="neutral">Neutral</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
           </select>
+          
+          <label>🎂 Age Group:</label>
+          <select id="audioAge">
+            <option value="young">Young</option>
+            <option value="middle">Middle</option>
+            <option value="old">Old</option>
+          </select>
+          
+          <label>🎭 Style (15+):</label>
           <select id="audioStyle">
-            <option value="normal">Normal</option>
-            <option value="poetry">Poetry</option>
-            <option value="sad">Sad</option>
-            <option value="excited">Excited</option>
+            <option value="neutral">🔘 Neutral (Natural)</option>
+            <option value="poetry">📖 Poetry</option>
+            <option value="sad">😢 Sad</option>
+            <option value="excited">🎉 Excited</option>
+            <option value="robot">🤖 Robot</option>
+            <option value="dramatic">🎭 Dramatic</option>
+            <option value="horror">👻 Horror</option>
+            <option value="cartoon">🎨 Cartoon</option>
+            <option value="deep">🎙️ Deep Narrator</option>
+            <option value="whisper">🤫 Whisper</option>
+            <option value="cheerful">😊 Cheerful</option>
+            <option value="grumpy">😠 Grumpy</option>
+            <option value="formal">👔 Formal</option>
+            <option value="casual">👕 Casual</option>
+            <option value="narrator">📖 Narrator</option>
           </select>
-          <label>Speed: <span id="rateVal">0.9</span></label>
+          
+          <label>⏩ Speed: <span id="rateVal">0.9</span></label>
           <input type="range" id="audioRate" min="0.1" max="3" step="0.1" value="0.9" style="width:100%;">
         </div>
+        
         <div class="btn-group">
           <button class="btn" onclick="speakAudio()">🔊 Listen</button>
-          <button class="btn btn-s" onclick="downloadAudio()">💾 Download</button>
+          <button class="btn btn-s" onclick="downloadAudio()">💾 Download MP3</button>
         </div>
         <div class="msg" id="audioMsg"></div>
       </div>
@@ -248,6 +272,26 @@
         </div>
         <div class="result" id="imageResult"></div>
         <div class="msg" id="imageMsg"></div>
+      </div>
+
+      <!-- ===== DUBBING ===== -->
+      <div class="content" id="content-dubbing">
+        <h3>🔊 Voice Dubbing</h3>
+        <p style="color:#999; font-size:14px;">Convert video voice to another language</p>
+        <input type="file" id="dubVideo" accept="video/*">
+        <select id="dubLang"></select>
+        <button class="btn" onclick="dubVideo()">🔁 Dub</button>
+        <div class="result" id="dubResult"></div>
+        <div class="msg" id="dubMsg"></div>
+      </div>
+
+      <!-- ===== VOICE CLONE ===== -->
+      <div class="content" id="content-clone">
+        <h3>🎭 Voice Clone</h3>
+        <p style="color:#999; font-size:14px;">Upload your voice sample (10-30 seconds) to clone</p>
+        <input type="file" id="cloneAudio" accept="audio/*">
+        <button class="btn" onclick="cloneVoice()">🎤 Clone & Speak</button>
+        <div class="msg" id="cloneMsg"></div>
       </div>
 
       <!-- ===== AI CHAT ===== -->
@@ -267,15 +311,10 @@
       <!-- ===== TRANSLATE ===== -->
       <div class="content" id="content-translate">
         <h3>🌍 Translate</h3>
+        <p style="color:#999; font-size:14px;">50+ languages available</p>
         <textarea id="transScript" placeholder="Text to translate..."></textarea>
         <div class="flex">
-          <select id="transTarget" style="flex:1;">
-            <option value="en">English</option>
-            <option value="ur">Urdu</option>
-            <option value="hi">Hindi</option>
-            <option value="ar">Arabic</option>
-            <option value="es">Spanish</option>
-          </select>
+          <select id="transTarget" style="flex:1;"></select>
           <button class="btn" onclick="doTranslate()">🔁 Translate</button>
         </div>
         <div class="result" id="transResult"></div>
@@ -285,8 +324,12 @@
       <!-- ===== CAPTIONS ===== -->
       <div class="content" id="content-captions">
         <h3>📝 Captions</h3>
+        <p style="color:#999; font-size:14px;">50+ languages available</p>
         <textarea id="capScript" placeholder="Script for captions..."></textarea>
-        <button class="btn" onclick="genCaptions()">📝 Generate</button>
+        <div class="flex">
+          <select id="capLang" style="flex:1;"></select>
+          <button class="btn" onclick="genCaptions()">📝 Generate</button>
+        </div>
         <div class="result" id="capResult"></div>
         <div class="msg" id="capMsg"></div>
       </div>
