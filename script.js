@@ -1,74 +1,30 @@
 // =============================================
-// 1. NAVIGATION & AUTH
+// 1. AUTHENTICATION (Login/Signup)
 // =============================================
 let currentUser = null;
-
-function toggleMenu() {
-  document.getElementById('navLinks').classList.toggle('open');
-}
-
-function showPage(page) {
-  // Check if user is logged in
-  if (page === 'studio' || page === 'dashboard') {
-    if (!currentUser) {
-      alert('⚠️ Please login first!');
-      openModal('login');
-      return;
-    }
-  }
-
-  document.getElementById('homePage').style.display = 'none';
-  document.getElementById('studioPage').style.display = 'none';
-  document.getElementById('dashboardPage').style.display = 'none';
-
-  if (page === 'home') document.getElementById('homePage').style.display = 'block';
-  else if (page === 'studio') {
-    document.getElementById('studioPage').style.display = 'block';
-    document.getElementById('studioPage').scrollIntoView({ behavior: 'smooth' });
-  } else if (page === 'dashboard') {
-    document.getElementById('dashboardPage').style.display = 'block';
-    document.getElementById('dashboardUsername').textContent = currentUser.name;
-    document.getElementById('dashboardEmail').textContent = currentUser.email;
-  }
-
-  document.querySelectorAll('.nav-links a').forEach(link => link.classList.remove('active'));
-  document.querySelectorAll('.nav-links a').forEach(link => {
-    if (link.textContent.toLowerCase().includes(page)) link.classList.add('active');
-  });
-  document.getElementById('navLinks').classList.remove('open');
-}
-
-// =============================================
-// 2. AUTHENTICATION
-// =============================================
 let isLoginMode = true;
-
-function openModal(mode) {
-  isLoginMode = mode === 'login';
-  document.getElementById('authModal').style.display = 'flex';
-  document.getElementById('modalTitle').textContent = isLoginMode ? 'Login' : 'Sign Up';
-  document.getElementById('authBtn').textContent = isLoginMode ? 'Login' : 'Sign Up';
-  document.getElementById('switchLink').textContent = isLoginMode ? "Don't have account? Sign Up" : "Already have account? Login";
-  document.getElementById('authName').style.display = isLoginMode ? 'none' : 'block';
-  document.getElementById('authEmail').value = '';
-  document.getElementById('authPassword').value = '';
-  document.getElementById('authName').value = '';
-}
-
-function closeModal() { document.getElementById('authModal').style.display = 'none'; }
 
 function switchAuthMode() {
   isLoginMode = !isLoginMode;
-  openModal(isLoginMode ? 'login' : 'signup');
+  document.getElementById('loginBtn').textContent = isLoginMode ? 'Login' : 'Sign Up';
+  document.getElementById('switchLink').textContent = isLoginMode ? "Don't have account? Sign Up" : "Already have account? Login";
+  document.getElementById('loginName').style.display = isLoginMode ? 'none' : 'block';
+  document.getElementById('loginError').textContent = '';
 }
 
-function handleAuth() {
-  const email = document.getElementById('authEmail').value.trim();
-  const password = document.getElementById('authPassword').value.trim();
-  const name = document.getElementById('authName').value.trim();
+function handleLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value.trim();
+  const name = document.getElementById('loginName').value.trim();
 
-  if (!email || !password) { alert('Email and password required!'); return; }
-  if (!isLoginMode && !name) { alert('Full name required!'); return; }
+  if (!email || !password) {
+    document.getElementById('loginError').textContent = '⚠️ Email and password required!';
+    return;
+  }
+  if (!isLoginMode && !name) {
+    document.getElementById('loginError').textContent = '⚠️ Full name required!';
+    return;
+  }
 
   const users = JSON.parse(localStorage.getItem('users') || '[]');
 
@@ -77,16 +33,14 @@ function handleAuth() {
     if (user) {
       currentUser = user;
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
-      updateUI();
-      closeModal();
-      showPage('studio');
-      document.getElementById('message').textContent = '✅ Welcome back, ' + user.name + '!';
+      document.getElementById('loginError').textContent = '';
+      showApp();
     } else {
-      alert('❌ Invalid email or password!');
+      document.getElementById('loginError').textContent = '❌ Invalid email or password!';
     }
   } else {
     if (users.find(u => u.email === email)) {
-      alert('❌ Email already registered!');
+      document.getElementById('loginError').textContent = '❌ Email already registered!';
       return;
     }
     const newUser = { email, password, name, createdAt: new Date().toISOString() };
@@ -94,99 +48,163 @@ function handleAuth() {
     localStorage.setItem('users', JSON.stringify(users));
     currentUser = newUser;
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    updateUI();
-    closeModal();
-    showPage('studio');
-    document.getElementById('message').textContent = '✅ Account created! Welcome, ' + name + '!';
+    document.getElementById('loginError').textContent = '';
+    showApp();
   }
+}
+
+function showApp() {
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('appContainer').style.display = 'block';
+  document.getElementById('displayName').textContent = currentUser.name;
+  document.getElementById('dashName').textContent = currentUser.name;
 }
 
 function logoutUser() {
   currentUser = null;
   localStorage.removeItem('currentUser');
-  updateUI();
-  showPage('home');
-  document.getElementById('message').textContent = '👋 Logged out!';
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'none';
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').textContent = '';
 }
 
-function updateUI() {
-  if (currentUser) {
-    document.getElementById('authButtons').style.display = 'none';
-    document.getElementById('userDisplay').style.display = 'inline-block';
-    document.getElementById('usernameDisplay').textContent = currentUser.name;
-  } else {
-    document.getElementById('authButtons').style.display = 'inline-block';
-    document.getElementById('userDisplay').style.display = 'none';
+// Check saved user on load
+window.onload = function() {
+  const saved = localStorage.getItem('currentUser');
+  if (saved) {
+    currentUser = JSON.parse(saved);
+    showApp();
+    // Load voices for audio tool
+    loadAudioVoices();
+  }
+  // Slider updates
+  setupSliders();
+};
+
+// Enter key for login
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') {
+    handleLogin();
+  }
+});
+
+// =============================================
+// 2. TOOL SWITCHING (Only one tool at a time)
+// =============================================
+function switchTool(tool) {
+  // Update sidebar
+  document.querySelectorAll('.sidebar .tool-item').forEach(el => el.classList.remove('active'));
+  document.querySelector(`.sidebar .tool-item[data-tool="${tool}"]`).classList.add('active');
+
+  // Update panel content
+  document.querySelectorAll('.panel .tool-content').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tool-${tool}`).classList.add('active');
+
+  // Update title
+  const titles = {
+    'dashboard': '📊 Dashboard',
+    'text-to-video': '🎬 Text-to-Video',
+    'text-to-audio': '🗣️ Text-to-Audio',
+    'text-to-image': '🖼️ Text-to-Image',
+    'ai-chat': '🤖 AI Chat',
+    'translate': '🌍 Translate',
+    'captions': '📝 Captions',
+    'video-effects': '🎨 Video Effects'
+  };
+  document.getElementById('toolTitle').innerHTML = `<h2>${titles[tool] || 'Tool'}</h2>`;
+}
+
+// =============================================
+// 3. TEXT-TO-VIDEO (Free)
+// =============================================
+async function generateVideo() {
+  const script = document.getElementById('videoScript').value.trim();
+  if (!script) {
+    document.getElementById('videoMessage').textContent = '⚠️ Please enter a script!';
+    return;
+  }
+  document.getElementById('videoMessage').textContent = '⏳ Generating video...';
+  document.getElementById('videoResult').style.display = 'block';
+  document.getElementById('videoResult').innerHTML = '⏳ Please wait...';
+
+  try {
+    const prompt = encodeURIComponent(script);
+    const videoUrl = `https://image.pollinations.ai/prompt/${prompt}?width=1280&height=720&nologo=true`;
+    document.getElementById('videoResult').innerHTML = `
+      <video controls style="width:100%; max-height:400px; border-radius:12px;">
+        <source src="${videoUrl}" type="video/mp4">
+      </video>
+    `;
+    document.getElementById('videoMessage').textContent = '✅ Video generated!';
+  } catch(e) {
+    document.getElementById('videoResult').innerHTML = '❌ Error: ' + e.message;
+    document.getElementById('videoMessage').textContent = '❌ Failed to generate.';
   }
 }
 
-// Check saved user
-window.onload = function() {
-  const saved = localStorage.getItem('currentUser');
-  if (saved) { currentUser = JSON.parse(saved); updateUI(); }
-  loadVoices();
-};
+// =============================================
+// 4. TEXT-TO-AUDIO
+// =============================================
+let audioMediaRecorder, audioChunks = [];
+let audioUtterance = null;
 
-// =============================================
-// 3. VOICE FUNCTIONS
-// =============================================
-function loadVoices() {
+function loadAudioVoices() {
   const voices = window.speechSynthesis.getVoices();
-  const select = document.getElementById('voiceSelect');
-  if (!select) return;
-  select.innerHTML = '<option value="">Default</option>';
-  voices.forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v.name;
-    opt.textContent = v.name + ' (' + v.lang + ')';
-    select.appendChild(opt);
-  });
+  // Just cache voices
 }
-window.speechSynthesis.onvoiceschanged = loadVoices;
-setTimeout(loadVoices, 1000);
+window.speechSynthesis.onvoiceschanged = loadAudioVoices;
+setTimeout(loadAudioVoices, 1000);
 
-function speakScript() {
-  const text = document.getElementById('script').value.trim();
-  if (!text) { document.getElementById('message').textContent = '⚠️ Script likho!'; return; }
+function speakAudio() {
+  const text = document.getElementById('audioScript').value.trim();
+  if (!text) {
+    document.getElementById('audioMessage').textContent = '⚠️ Enter text to speak!';
+    return;
+  }
   window.speechSynthesis.cancel();
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = document.getElementById('langSelect').value;
-  utterance.rate = parseFloat(document.getElementById('rateSlider').value);
-  utterance.pitch = parseFloat(document.getElementById('pitchSlider').value);
+  utterance.lang = document.getElementById('audioLang').value;
+  utterance.rate = parseFloat(document.getElementById('audioRate').value);
+  utterance.pitch = parseFloat(document.getElementById('audioPitch').value);
 
-  const voiceName = document.getElementById('voiceSelect').value;
-  if (voiceName) {
-    const voice = window.speechSynthesis.getVoices().find(v => v.name === voiceName);
-    if (voice) utterance.voice = voice;
+  const style = document.getElementById('audioStyle').value;
+  switch(style) {
+    case 'poetry': utterance.rate = 0.6; utterance.pitch = 1.1; break;
+    case 'sad': utterance.rate = 0.5; utterance.pitch = 0.8; break;
+    case 'excited': utterance.rate = 1.4; utterance.pitch = 1.3; break;
+    case 'robot': utterance.rate = 1.0; utterance.pitch = 0.5; break;
+    default: break;
   }
 
-  utterance.onstart = () => { document.getElementById('message').textContent = '🎙️ Playing...'; };
-  utterance.onend = () => { document.getElementById('message').textContent = '✅ Done!'; };
+  utterance.onstart = () => { document.getElementById('audioMessage').textContent = '🎙️ Playing...'; };
+  utterance.onend = () => { document.getElementById('audioMessage').textContent = '✅ Done!'; };
+  utterance.onerror = () => { document.getElementById('audioMessage').textContent = '❌ Error playing audio.'; };
   window.speechSynthesis.speak(utterance);
+  audioUtterance = utterance;
 }
 
-// =============================================
-// 4. VOICE DOWNLOAD
-// =============================================
-let mediaRecorder, audioChunks = [];
-
-function downloadVoice() {
-  const text = document.getElementById('script').value.trim();
-  if (!text) { document.getElementById('message').textContent = '⚠️ Script likho!'; return; }
-  document.getElementById('message').textContent = '⏳ Recording...';
+function downloadAudio() {
+  const text = document.getElementById('audioScript').value.trim();
+  if (!text) {
+    document.getElementById('audioMessage').textContent = '⚠️ Enter text to download!';
+    return;
+  }
+  document.getElementById('audioMessage').textContent = '⏳ Recording...';
 
   const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = document.getElementById('langSelect').value;
-  utterance.rate = parseFloat(document.getElementById('rateSlider').value);
-  utterance.pitch = parseFloat(document.getElementById('pitchSlider').value);
+  utterance.lang = document.getElementById('audioLang').value;
+  utterance.rate = parseFloat(document.getElementById('audioRate').value);
+  utterance.pitch = parseFloat(document.getElementById('audioPitch').value);
 
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   const dest = audioCtx.createMediaStreamDestination();
-  mediaRecorder = new MediaRecorder(dest.stream);
+  audioMediaRecorder = new MediaRecorder(dest.stream);
   audioChunks = [];
-  mediaRecorder.ondataavailable = e => { if (e.data.size) audioChunks.push(e.data); };
-  mediaRecorder.onstop = () => {
+  audioMediaRecorder.ondataavailable = e => { if (e.data.size) audioChunks.push(e.data); };
+  audioMediaRecorder.onstop = () => {
     const blob = new Blob(audioChunks, { type: 'audio/mp3' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -196,11 +214,12 @@ function downloadVoice() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    document.getElementById('message').textContent = '✅ Downloaded!';
+    document.getElementById('audioMessage').textContent = '✅ Downloaded!';
     audioCtx.close();
   };
-  mediaRecorder.start();
-  utterance.onend = () => mediaRecorder.stop();
+  audioMediaRecorder.start();
+  utterance.onend = () => audioMediaRecorder.stop();
+  utterance.onerror = () => { document.getElementById('audioMessage').textContent = '❌ Error recording.'; audioMediaRecorder.stop(); };
   window.speechSynthesis.speak(utterance);
 }
 
@@ -209,88 +228,114 @@ function downloadVoice() {
 // =============================================
 function generateImage() {
   const prompt = document.getElementById('imagePrompt').value.trim();
-  if (!prompt) { document.getElementById('message').textContent = '⚠️ Describe image!'; return; }
-  const container = document.getElementById('imageResult');
-  container.innerHTML = '⏳ Generating...';
+  if (!prompt) {
+    document.getElementById('imageMessage').textContent = '⚠️ Describe the image!';
+    return;
+  }
+  document.getElementById('imageMessage').textContent = '⏳ Generating...';
+  document.getElementById('imageResult').style.display = 'block';
+  
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=512&height=512&nologo=true`;
-  container.innerHTML = `<img src="${url}" style="max-width:100%; max-height:300px; border-radius:12px; border:2px solid #d4af37;">`;
-  document.getElementById('message').textContent = '✅ Image generated!';
+  document.getElementById('imageResult').innerHTML = `<img src="${url}" style="max-width:100%; max-height:400px; border-radius:12px; border:2px solid #d4af37;">`;
+  document.getElementById('imageMessage').textContent = '✅ Image generated!';
 }
 
 // =============================================
-// 6. TEXT-TO-VIDEO (FREE)
+// 6. AI CHAT (Gemini)
 // =============================================
-async function generateFreeVideo() {
-  const script = document.getElementById('script').value.trim();
-  if (!script) { document.getElementById('message').textContent = '⚠️ Script likho!'; return; }
-  document.getElementById('message').textContent = '⏳ Video generating...';
-  document.getElementById('freeVideoResult').innerHTML = '⏳ Please wait...';
-  
-  try {
-    const prompt = encodeURIComponent(script);
-    const videoUrl = `https://image.pollinations.ai/prompt/${prompt}?width=1280&height=720&nologo=true`;
-    document.getElementById('freeVideoResult').innerHTML = `
-      <video controls style="width:100%; max-height:300px; border-radius:12px; border:2px solid #d4af37;">
-        <source src="${videoUrl}" type="video/mp4">
-      </video>
-    `;
-    document.getElementById('message').textContent = '✅ Video ready!';
-  } catch(e) {
-    document.getElementById('freeVideoResult').innerHTML = '❌ Error: ' + e.message;
+async function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const container = document.getElementById('chatContainer');
+  const key = document.getElementById('chatKey').value.trim();
+  if (!key) {
+    container.innerHTML += `<div style="background:#1a1a2a; padding:12px; border-radius:10px; margin:5px 0;"><b>Bot:</b> Please enter Gemini API key.</div>`;
+    input.value = '';
+    container.scrollTop = container.scrollHeight;
+    return;
   }
+
+  container.innerHTML += `<div style="background:#2a2a3a; padding:12px; border-radius:10px; margin:5px 0; text-align:right; max-width:80%; margin-left:auto;"><b>You:</b> ${msg}</div>`;
+  input.value = '';
+  container.scrollTop = container.scrollHeight;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: msg }] }] })
+    });
+    const data = await response.json();
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || '⚠️ No reply.';
+    container.innerHTML += `<div style="background:#1a1a2a; padding:12px; border-radius:10px; margin:5px 0;"><b>Bot:</b> ${reply}</div>`;
+  } catch(e) {
+    container.innerHTML += `<div style="background:#1a1a2a; padding:12px; border-radius:10px; margin:5px 0;"><b>Bot:</b> Error: ${e.message}</div>`;
+  }
+  container.scrollTop = container.scrollHeight;
 }
+
+document.getElementById('chatInput').addEventListener('keyup', function(e) {
+  if (e.key === 'Enter') sendChatMessage();
+});
 
 // =============================================
 // 7. TRANSLATE
 // =============================================
-async function translateScript() {
-  const text = document.getElementById('script').value.trim();
-  if (!text) { document.getElementById('message').textContent = '⚠️ Script likho!'; return; }
+async function translateText() {
+  const text = document.getElementById('translateScript').value.trim();
+  if (!text) {
+    document.getElementById('translateMessage').textContent = '⚠️ Enter text to translate!';
+    return;
+  }
   const target = document.getElementById('translateTarget').value;
-  document.getElementById('translationResult').innerHTML = '⏳ Translating...';
+  document.getElementById('translateMessage').textContent = '⏳ Translating...';
+  document.getElementById('translateResult').style.display = 'block';
+
   try {
     const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target}&dt=t&q=${encodeURIComponent(text)}`);
     const data = await res.json();
-    document.getElementById('translationResult').innerHTML = '🌐 <b>Translation:</b> ' + data[0][0][0];
+    document.getElementById('translateResult').innerHTML = data[0][0][0];
+    document.getElementById('translateMessage').textContent = '✅ Translation ready!';
   } catch(e) {
-    document.getElementById('translationResult').innerHTML = '❌ Translation failed.';
+    document.getElementById('translateResult').innerHTML = '❌ Error: ' + e.message;
+    document.getElementById('translateMessage').textContent = '❌ Translation failed.';
   }
 }
 
 // =============================================
 // 8. CAPTIONS
 // =============================================
-function showCaptions() {
-  const script = document.getElementById('script').value.trim();
-  if (!script) { document.getElementById('message').textContent = '⚠️ Script likho!'; return; }
-  const result = document.getElementById('captionsResult');
-  result.style.display = 'block';
-  result.innerHTML = '📝 ' + script;
-  document.getElementById('message').textContent = '✅ Captions ready!';
+function generateCaptions() {
+  const script = document.getElementById('captionsScript').value.trim();
+  if (!script) {
+    document.getElementById('captionsMessage').textContent = '⚠️ Enter script for captions!';
+    return;
+  }
+  document.getElementById('captionsResult').style.display = 'block';
+  document.getElementById('captionsResult').innerHTML = '📝 ' + script;
+  document.getElementById('captionsMessage').textContent = '✅ Captions generated!';
 }
 
 // =============================================
-// 9. VIDEO UPLOAD + EFFECTS
+// 9. VIDEO EFFECTS
 // =============================================
-document.addEventListener('DOMContentLoaded', function() {
-  const upload = document.getElementById('videoUpload');
-  if (upload) {
-    upload.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const video = document.getElementById('uploadedVideoPreview');
-        video.src = URL.createObjectURL(file);
-        video.style.display = 'block';
-        video.onloadedmetadata = function() { applyFilter('none'); };
-      }
-    });
+document.getElementById('effectVideo').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const video = document.getElementById('effectVideoPreview');
+    video.src = URL.createObjectURL(file);
+    video.style.display = 'block';
   }
 });
 
-function applyFilter(filter) {
-  const video = document.getElementById('uploadedVideoPreview');
-  if (!video.src || video.style.display === 'none') { document.getElementById('message').textContent = '⚠️ Pehle video upload karein!'; return; }
-  const canvas = document.getElementById('videoCanvas');
+function applyVideoFilter(filter) {
+  const video = document.getElementById('effectVideoPreview');
+  if (!video.src || video.style.display === 'none') {
+    document.getElementById('effectMessage').textContent = '⚠️ Please upload a video first!';
+    return;
+  }
+  const canvas = document.getElementById('effectCanvas');
   const ctx = canvas.getContext('2d');
   canvas.width = video.videoWidth || 640;
   canvas.height = video.videoHeight || 360;
@@ -321,84 +366,36 @@ function applyFilter(filter) {
   };
   video.play();
   setTimeout(draw, 100);
-  document.getElementById('message').textContent = '✅ Filter: ' + filter;
+  document.getElementById('effectMessage').textContent = '✅ Filter: ' + filter;
 }
 
-function downloadUploadedVideo() {
-  const video = document.getElementById('uploadedVideoPreview');
-  if (!video.src) { document.getElementById('message').textContent = '⚠️ Pehle video upload karein!'; return; }
+function downloadEffectVideo() {
+  const video = document.getElementById('effectVideoPreview');
+  if (!video.src) {
+    document.getElementById('effectMessage').textContent = '⚠️ Please upload a video!';
+    return;
+  }
   const a = document.createElement('a');
   a.href = video.src;
   a.download = 'video_' + Date.now() + '.mp4';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+  document.getElementById('effectMessage').textContent = '✅ Download started!';
 }
 
 // =============================================
-// 10. CHATBOT
+// 10. SLIDER UI UPDATES
 // =============================================
-async function sendChat() {
-  const input = document.getElementById('chatInput');
-  const msg = input.value.trim();
-  if (!msg) return;
-  const container = document.getElementById('chatContainer');
-  const key = document.getElementById('geminiKey').value.trim();
-  if (!key) {
-    container.innerHTML += `<div style="background:#1a1a2a; padding:10px; border-radius:8px; margin:5px 0;"><b>Bot:</b> Please enter Gemini API key first.</div>`;
-    input.value = '';
-    container.scrollTop = container.scrollHeight;
-    return;
+function setupSliders() {
+  const rateSlider = document.getElementById('audioRate');
+  const rateVal = document.getElementById('audioRateVal');
+  if (rateSlider && rateVal) {
+    rateSlider.addEventListener('input', () => rateVal.textContent = rateSlider.value);
   }
-
-  container.innerHTML += `<div style="background:#2a2a3a; padding:10px; border-radius:8px; margin:5px 0; text-align:right; max-width:80%; margin-left:auto;"><b>You:</b> ${msg}</div>`;
-  input.value = '';
-  container.scrollTop = container.scrollHeight;
-
-  try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: msg }] }] })
-    });
-    const data = await response.json();
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || '⚠️ No reply.';
-    container.innerHTML += `<div style="background:#1a1a2a; padding:10px; border-radius:8px; margin:5px 0; max-width:80%;"><b>Bot:</b> ${reply}</div>`;
-  } catch(e) {
-    container.innerHTML += `<div style="background:#1a1a2a; padding:10px; border-radius:8px; margin:5px 0;"><b>Bot:</b> Error: ${e.message}</div>`;
+  const pitchSlider = document.getElementById('audioPitch');
+  const pitchVal = document.getElementById('audioPitchVal');
+  if (pitchSlider && pitchVal) {
+    pitchSlider.addEventListener('input', () => pitchVal.textContent = pitchSlider.value);
   }
-  container.scrollTop = container.scrollHeight;
 }
-
-document.getElementById('chatInput').addEventListener('keyup', function(e) {
-  if (e.key === 'Enter') sendChat();
-});
-
-// =============================================
-// 11. PROJECT
-// =============================================
-function startProject() {
-  const name = document.getElementById('projectName').value.trim();
-  const script = document.getElementById('script').value.trim();
-  if (!name || !script) {
-    document.getElementById('message').textContent = '⚠️ Project name aur script likhein!';
-    return;
-  }
-  document.getElementById('message').textContent = '✅ Project "' + name + '" created!';
-  
-  // Update dashboard project count
-  const count = parseInt(localStorage.getItem('projectCount') || '0') + 1;
-  localStorage.setItem('projectCount', count);
-  document.getElementById('projectCount').textContent = count;
-}
-
-// Slider UI
-document.addEventListener('DOMContentLoaded', function() {
-  ['rate','pitch'].forEach(id => {
-    const slider = document.getElementById(id + 'Slider');
-    const display = document.getElementById(id + 'Value');
-    if (slider && display) {
-      slider.addEventListener('input', () => display.textContent = slider.value);
-    }
-  });
-});
