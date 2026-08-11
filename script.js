@@ -332,6 +332,11 @@ function saveUser() {
 }
 
 // =============================================
+// BACKEND BASE URL (PXXL) — frontend is on GitHub Pages, backend is separate
+// =============================================
+const API_BASE = 'https://empire-ai-studio.pxxlspace.cv';
+
+// =============================================
 // 7. TEXT→VIDEO
 // =============================================
 async function genVideo() {
@@ -341,13 +346,32 @@ async function genVideo() {
   const r = document.getElementById('videoResult');
   r.style.display = 'block';
   try {
-    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(s)}?width=1280&height=720&nologo=true`;
-    r.innerHTML = `<video controls style="width:100%; max-height:250px; border-radius:8px;"><source src="${url}" type="video/mp4"></video>`;
+    const res = await fetch(`${API_BASE}/api/generate-video`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ script: s })
+    });
+    const data = await res.json();
+
+    if (!data.videoUrl) {
+      r.innerHTML = '❌ Error';
+      document.getElementById('videoMsg').textContent = '❌ Failed: ' + (data.error || data.reason || 'Unknown error');
+      return;
+    }
+
+    if (data.fallback) {
+      // Backend fell back to an image (Fal.ai unavailable) — show as image, not <video>
+      r.innerHTML = `<img src="${data.videoUrl}" style="width:100%; max-height:250px; border-radius:8px;">`;
+      document.getElementById('videoMsg').textContent = '⚠️ Real video unavailable, showing image fallback (' + (data.reason || '') + ')';
+    } else {
+      r.innerHTML = `<video controls style="width:100%; max-height:250px; border-radius:8px;"><source src="${data.videoUrl}" type="video/mp4"></video>`;
+      document.getElementById('videoMsg').textContent = '✅ Video ready!';
+    }
+
     document.getElementById('videoCaptions').style.display = 'block';
     document.getElementById('videoCaptions').innerHTML = '📝 ' + s;
-    document.getElementById('videoMsg').textContent = '✅ Video ready!';
     if (currentUser) { currentUser.stats = currentUser.stats || {}; currentUser.stats.videos = (currentUser.stats.videos || 0) + 1; saveUser(); updateDashboard(); }
-  } catch(e) { r.innerHTML = '❌ Error'; document.getElementById('videoMsg').textContent = '❌ Failed.'; }
+  } catch(e) { r.innerHTML = '❌ Error'; document.getElementById('videoMsg').textContent = '❌ Failed: ' + e.message; }
 }
 
 // =============================================
