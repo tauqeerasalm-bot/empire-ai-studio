@@ -49,57 +49,63 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// 2. Video Endpoint (Fal.ai / Pollinations Fallback)
+// 2. Video Endpoint (Hugging Face / Pollinations Fallback)
 app.post('/api/generate-video', async (req, res) => {
   const { script } = req.body;
-  const falKey = process.env.FAL_API_KEY;
+  const hfKey = process.env.HF_API_KEY;
 
   if (!script) return res.status(400).json({ error: 'Script missing' });
 
+  const pollinationsFallback = () =>
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(script)}?width=1280&height=720&nologo=true`;
+
   // No key at all -> straight to fallback, but log it so it's obvious why
-  if (!falKey) {
-    console.warn('FAL_API_KEY missing — using Pollinations image fallback.');
-    const videoUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(script)}?width=1280&height=720&nologo=true`;
-    return res.json({ videoUrl, fallback: true, reason: 'FAL_API_KEY missing' });
+  if (!hfKey) {
+    console.warn('HF_API_KEY missing — using Pollinations image fallback.');
+    return res.json({ videoUrl: pollinationsFallback(), fallback: true, reason: 'HF_API_KEY missing' });
   }
 
   try {
-    const response = await fetch('https://fal.run/fal-ai/wan/v2', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Key ${falKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ prompt: script })
-    });
+    // Hugging Face Inference API — free tier, rate-limited, shared GPU pool.
+    // Model: ali-vilab/text-to-video-ms-1.7b (a widely available free text-to-video model)
+    const response = await fetch(
+      'https://api-inference.huggingface.co/models/ali-vilab/text-to-video-ms-1.7b',
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${hfKey}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ inputs: script })
+      }
+    );
 
-    const data = await response.json();
+    console.log('HF STATUS:', response.status);
+    const contentType = response.headers.get('content-type') || '';
 
-    // ALWAYS log the raw response so we can see exactly what Fal.ai sent back
-    console.log('FAL STATUS:', response.status);
-    console.log('FAL RESPONSE:', JSON.stringify(data));
-
-    if (!response.ok) {
-      console.error('FAL.AI REQUEST FAILED:', response.status, JSON.stringify(data));
-      const videoUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(script)}?width=1280&height=720&nologo=true`;
-      return res.json({ videoUrl, fallback: true, reason: `Fal.ai error ${response.status}`, falError: data });
-    }
-
-    const videoUrl = data.video?.url || data.video_url || data.output?.video?.url;
-
-    if (videoUrl) {
+    // Success -> Hugging Face returns raw video bytes (video/mp4)
+    if (response.ok && contentType.includes('video')) {
+      const buffer = Buffer.from(await response.arrayBuffer());
+      const base64 = buffer.toString('base64');
+      const videoUrl = `data:video/mp4;base64,${base64}`;
       return res.json({ videoUrl, fallback: false });
     }
 
-    // Request succeeded but no video URL found in expected fields
-    console.error('FAL.AI SUCCEEDED BUT NO VIDEO URL FOUND. Full response:', JSON.stringify(data));
-    const fallbackUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(script)}?width=1280&height=720&nologo=true`;
-    return res.json({ videoUrl: fallbackUrl, fallback: true, reason: 'No video URL in Fal.ai response', rawResponse: data });
+    // Not ok, or not a video -> read as JSON/text to see why (model loading, rate limit, etc.)
+    const raw = await response.text();
+    console.log('HF RESPONSE:', raw.slice(0, 500));
+
+    let reason = `Hugging Face error ${response.status}`;
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed?.error) reason = parsed.error; // e.g. "Model is currently loading", "rate limit exceeded"
+    } catch (_) { /* not JSON, ignore */ }
+
+    return res.json({ videoUrl: pollinationsFallback(), fallback: true, reason });
 
   } catch (err) {
     console.error('VIDEO ENDPOINT CRASH:', err);
-    const videoUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(script)}?width=1280&height=720&nologo=true`;
-    res.json({ videoUrl, fallback: true, reason: err.message });
+    return res.json({ videoUrl: pollinationsFallback(), fallback: true, reason: err.message });
   }
 });
 
@@ -140,4 +146,3 @@ if (require.main === module) {
 }
 
 module.exports = app;
-                                             
