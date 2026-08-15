@@ -408,10 +408,16 @@
 
         <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Filters</div>
         <div class="btn-group">
+          <button class="btn btn-s" onclick="applyEditorFilter('none')">🔄 None</button>
           <button class="btn btn-s" onclick="applyEditorFilter('grayscale')">⚫ Grayscale</button>
           <button class="btn btn-s" onclick="applyEditorFilter('sepia')">🟫 Sepia</button>
           <button class="btn btn-s" onclick="applyEditorFilter('invert')">🌗 Invert</button>
-          <button class="btn btn-s" onclick="applyEditorFilter('none')">🔄 Reset</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('vintage')">📻 Vintage</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('warm')">🔥 Warm</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('cool')">❄️ Cool</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('noir')">🎬 Noir</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('vivid')">🌈 Vivid</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('soft')">🌸 Soft</button>
         </div>
 
         <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Adjust</div>
@@ -423,6 +429,18 @@
           <label style="color:#ccc; font-size:13px; width:80px;">Contrast</label>
           <input type="range" id="editorContrast" min="-100" max="100" value="0" style="flex:1;" oninput="applyEditorAdjust()">
         </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <label style="color:#ccc; font-size:13px; width:80px;">Saturation</label>
+          <input type="range" id="editorSaturation" min="-100" max="100" value="0" style="flex:1;" oninput="applyEditorAdjust()">
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <label style="color:#ccc; font-size:13px; width:80px;">Blur</label>
+          <input type="range" id="editorBlur" min="0" max="10" value="0" style="flex:1;" oninput="applyEditorAdjust()">
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <label style="color:#ccc; font-size:13px; width:80px;">Hue</label>
+          <input type="range" id="editorHue" min="0" max="360" value="0" style="flex:1;" oninput="applyEditorAdjust()">
+        </div>
 
         <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Rotate / Flip</div>
         <div class="btn-group">
@@ -430,6 +448,23 @@
           <button class="btn btn-s" onclick="flipEditor('h')">↔️ Flip H</button>
           <button class="btn btn-s" onclick="flipEditor('v')">↕️ Flip V</button>
         </div>
+
+        <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Text Overlay</div>
+        <input type="text" id="editorTextInput" placeholder="Enter text...">
+        <div style="display:flex; gap:10px; margin-bottom:8px;">
+          <input type="color" id="editorTextColor" value="#ffffff" style="width:50px; height:40px; padding:2px;">
+          <input type="range" id="editorTextSize" min="12" max="80" value="32" style="flex:1;">
+          <select id="editorTextPos" style="flex:1; padding:8px; border-radius:8px; background:#0e0e14; color:white; border:1px solid #444;">
+            <option value="top">Top</option>
+            <option value="center" selected>Center</option>
+            <option value="bottom">Bottom</option>
+          </select>
+        </div>
+        <button class="btn btn-s" onclick="addEditorText()">✍️ Add Text</button>
+
+        <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Watermark</div>
+        <input type="text" id="editorWatermarkInput" placeholder="e.g. @yourbrand">
+        <button class="btn btn-s" onclick="addEditorWatermark()">💧 Add Watermark</button>
 
         <button class="btn" style="width:100%; margin-top:14px;" onclick="downloadEditor()">💾 Download Image</button>
         <div class="msg" id="editorMsg"></div>
