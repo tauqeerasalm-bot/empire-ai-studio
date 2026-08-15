@@ -401,9 +401,10 @@
         <button class="btn" onclick="genEditorImage()">✨ Generate</button>
         <input type="file" id="editorUpload" accept="image/*" style="margin-top:10px;" onchange="uploadEditorImage(event)">
 
-        <div style="background:#000; border-radius:10px; overflow:hidden; margin-top:10px; display:flex; align-items:center; justify-content:center; min-height:200px;">
+        <div id="editorCanvasWrap" style="background:#000; border-radius:10px; overflow:hidden; margin-top:10px; display:flex; align-items:center; justify-content:center; min-height:200px; position:relative; touch-action:none;">
           <canvas id="editorCanvas" style="max-width:100%; display:none;"></canvas>
           <span id="editorPlaceholder" style="color:#555; font-size:13px;">[ image will appear here ]</span>
+          <div id="editorTextPreview" style="position:absolute; display:none; pointer-events:none; white-space:nowrap; transform:translate(-50%,-50%);"></div>
         </div>
 
         <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Filters</div>
@@ -450,17 +451,41 @@
         </div>
 
         <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Text Overlay</div>
-        <input type="text" id="editorTextInput" placeholder="Enter text...">
-        <div style="display:flex; gap:10px; margin-bottom:8px;">
-          <input type="color" id="editorTextColor" value="#ffffff" style="width:50px; height:40px; padding:2px;">
-          <input type="range" id="editorTextSize" min="12" max="80" value="32" style="flex:1;">
-          <select id="editorTextPos" style="flex:1; padding:8px; border-radius:8px; background:#0e0e14; color:white; border:1px solid #444;">
-            <option value="top">Top</option>
-            <option value="center" selected>Center</option>
-            <option value="bottom">Bottom</option>
-          </select>
+        <input type="text" id="editorTextInput" placeholder="Enter text..." oninput="updateEditorTextPreview()">
+
+        <select id="editorFontFamily" style="width:100%; padding:10px; margin-bottom:8px; border-radius:8px; background:#0e0e14; color:white; border:1px solid #444;" onchange="updateEditorTextPreview()">
+          <option value="Arial, sans-serif">Arial</option>
+          <option value="'Georgia', serif">Georgia</option>
+          <option value="'Times New Roman', serif">Times New Roman</option>
+          <option value="'Courier New', monospace">Courier New</option>
+          <option value="'Verdana', sans-serif">Verdana</option>
+          <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+          <option value="'Impact', sans-serif">Impact</option>
+          <option value="'Comic Sans MS', cursive">Comic Sans</option>
+          <option value="'Brush Script MT', cursive">Brush Script</option>
+          <option value="'Papyrus', fantasy">Papyrus</option>
+          <option value="'Segoe UI', sans-serif">Segoe UI</option>
+          <option value="'Tahoma', sans-serif">Tahoma</option>
+        </select>
+
+        <div class="btn-group">
+          <button class="btn btn-s" id="toggleBold" onclick="toggleEditorTextStyle('bold', this)">𝐁 Bold</button>
+          <button class="btn btn-s" id="toggleItalic" onclick="toggleEditorTextStyle('italic', this)">𝑰 Italic</button>
+          <button class="btn btn-s" id="toggleOutline" onclick="toggleEditorTextStyle('outline', this)">◯ Outline</button>
+          <button class="btn btn-s" id="toggleShadow" onclick="toggleEditorTextStyle('shadow', this)">◐ Shadow</button>
         </div>
-        <button class="btn btn-s" onclick="addEditorText()">✍️ Add Text</button>
+
+        <div style="display:flex; gap:10px; margin-bottom:8px; align-items:center;">
+          <input type="color" id="editorTextColor" value="#ffffff" style="width:50px; height:40px; padding:2px;" onchange="updateEditorTextPreview()">
+          <input type="range" id="editorTextSize" min="12" max="100" value="36" style="flex:1;" oninput="updateEditorTextPreview()">
+        </div>
+
+        <p style="color:#777; font-size:12px; margin-bottom:8px;">Type your text, then drag it anywhere on the image below.</p>
+        <div class="btn-group">
+          <button class="btn btn-s" onclick="updateEditorTextPreview(true)">🖊️ Preview</button>
+          <button class="btn" onclick="applyEditorText()">✅ Apply Text</button>
+          <button class="btn btn-s" onclick="cancelEditorTextPreview()">✖ Cancel</button>
+        </div>
 
         <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Watermark</div>
         <input type="text" id="editorWatermarkInput" placeholder="e.g. @yourbrand">
