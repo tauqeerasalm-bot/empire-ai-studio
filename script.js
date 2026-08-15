@@ -216,7 +216,8 @@ function switchTool(tool) {
     translate: '🌍 Translate',
     captions: '📝 Captions',
     effects: '🎨 Effects',
-    channels: '📡 Channels'
+    channels: '📡 Channels',
+    editor: '🖌️ Image Editor'
   };
   document.getElementById('panelTitle').innerHTML = `<h2>${titles[tool] || 'Tool'}</h2>`;
   if (tool === 'dashboard') updateDashboard();
@@ -661,3 +662,4 @@ function setupSliders() {
   const rv = document.getElementById('rateVal');
   if (r && rv) r.addEventListener('input', () => rv.textContent = r.value);
 }
+
