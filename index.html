@@ -156,6 +156,7 @@
       <div class="tool" data-tool="captions" onclick="switchTool('captions')">📝 Captions</div>
       <div class="tool" data-tool="effects" onclick="switchTool('effects')">🎨 Effects</div>
       <div class="tool" data-tool="channels" onclick="switchTool('channels')">📡 Channels</div>
+      <div class="tool" data-tool="editor" onclick="switchTool('editor')">🖌️ Image Editor</div>
     </div>
 
     <!-- PANEL -->
@@ -391,11 +392,55 @@
         </div>
       </div>
 
+      <!-- ===== IMAGE EDITOR ===== -->
+      <div class="content" id="content-editor">
+        <h3>🖌️ Image Editor</h3>
+        <p style="color:#999; font-size:14px;">Generate an image, then edit it — free, no API key.</p>
+
+        <textarea id="editorPrompt" placeholder="Describe image... e.g. A robot dancing on Mars"></textarea>
+        <button class="btn" onclick="genEditorImage()">✨ Generate</button>
+        <input type="file" id="editorUpload" accept="image/*" style="margin-top:10px;" onchange="uploadEditorImage(event)">
+
+        <div style="background:#000; border-radius:10px; overflow:hidden; margin-top:10px; display:flex; align-items:center; justify-content:center; min-height:200px;">
+          <canvas id="editorCanvas" style="max-width:100%; display:none;"></canvas>
+          <span id="editorPlaceholder" style="color:#555; font-size:13px;">[ image will appear here ]</span>
+        </div>
+
+        <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Filters</div>
+        <div class="btn-group">
+          <button class="btn btn-s" onclick="applyEditorFilter('grayscale')">⚫ Grayscale</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('sepia')">🟫 Sepia</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('invert')">🌗 Invert</button>
+          <button class="btn btn-s" onclick="applyEditorFilter('none')">🔄 Reset</button>
+        </div>
+
+        <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Adjust</div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <label style="color:#ccc; font-size:13px; width:80px;">Brightness</label>
+          <input type="range" id="editorBrightness" min="-100" max="100" value="0" style="flex:1;" oninput="applyEditorAdjust()">
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+          <label style="color:#ccc; font-size:13px; width:80px;">Contrast</label>
+          <input type="range" id="editorContrast" min="-100" max="100" value="0" style="flex:1;" oninput="applyEditorAdjust()">
+        </div>
+
+        <div style="color:#d4af37; font-size:12px; text-transform:uppercase; letter-spacing:1px; margin:14px 0 6px;">Rotate / Flip</div>
+        <div class="btn-group">
+          <button class="btn btn-s" onclick="rotateEditor(90)">↻ Rotate</button>
+          <button class="btn btn-s" onclick="flipEditor('h')">↔️ Flip H</button>
+          <button class="btn btn-s" onclick="flipEditor('v')">↕️ Flip V</button>
+        </div>
+
+        <button class="btn" style="width:100%; margin-top:14px;" onclick="downloadEditor()">💾 Download Image</button>
+        <div class="msg" id="editorMsg"></div>
+      </div>
+
     </div>
   </div>
 </div>
 
 <script src="script.js"></script>
 <script src="channels.js"></script>
+<script src="editor.js"></script>
 </body>
-  </html>
+</html>
