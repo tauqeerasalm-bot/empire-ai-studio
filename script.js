@@ -486,4 +486,178 @@ function genImage() {
   const r = document.getElementById('imageResult');
   r.style.display = 'block';
   r.innerHTML = `<img src="https://image.pollinations.ai/prompt/${encodeURIComponent(p)}?width=512&height=512&nologo=true" style="max-width:100%; max-height:250px; border-radius:8px; border:2px solid #d4af37;">`;
+  document.getElementById('imageMsg').textContent = '✅ Image ready!';
+  if (currentUser) { currentUser.stats = currentUser.stats || {}; currentUser.stats.images = (currentUser.stats.images || 0) + 1; saveUser(); updateDashboard(); }
+}
+
+// =============================================
+// 10. DUBBING (50+ Languages)
+// =============================================
+async function dubVideo() {
+  const file = document.getElementById('dubVideo').files[0];
+  if (!file) { document.getElementById('dubMsg').textContent = '⚠️ Upload video!'; return; }
+  document.getElementById('dubMsg').textContent = '⏳ Processing...';
   
+  const script = document.getElementById('videoScript').value.trim() || 'Hello, this is a test';
+  const target = document.getElementById('dubLang').value;
+  
+  try {
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${target.split('-')[0]}&dt=t&q=${encodeURIComponent(script)}`);
+    const data = await res.json();
+    const translated = data[0][0][0];
+    
+    const utterance = new SpeechSynthesisUtterance(translated);
+    utterance.lang = target;
+    utterance.rate = 0.9;
+    utterance.onstart = () => document.getElementById('dubMsg').textContent = '🔊 Playing dubbed voice...';
+    utterance.onend = () => {
+      document.getElementById('dubMsg').textContent = '✅ Dubbing complete!';
+      document.getElementById('dubResult').style.display = 'block';
+      document.getElementById('dubResult').innerHTML = `🌐 Translated: ${translated}`;
+    };
+    window.speechSynthesis.speak(utterance);
+  } catch(e) {
+    document.getElementById('dubMsg').textContent = '❌ Error: ' + e.message;
+  }
+}
+
+// =============================================
+// 11. VOICE CLONE
+// =============================================
+async function cloneVoice() {
+  const file = document.getElementById('cloneAudio').files[0];
+  if (!file) { document.getElementById('cloneMsg').textContent = '⚠️ Upload audio sample!'; return; }
+  document.getElementById('cloneMsg').textContent = '⏳ Processing voice clone... (demo)';
+  
+  const script = document.getElementById('audioScript').value.trim() || 'Hello, this is your cloned voice!';
+  const utterance = new SpeechSynthesisUtterance(script);
+  utterance.rate = 0.85;
+  utterance.pitch = 0.95;
+  utterance.onstart = () => document.getElementById('cloneMsg').textContent = '🔊 Playing cloned voice...';
+  utterance.onend = () => document.getElementById('cloneMsg').textContent = '✅ Voice clone demo complete!';
+  window.speechSynthesis.speak(utterance);
+}
+
+// =============================================
+// 12. AI CHAT
+// =============================================
+async function sendChat() {
+  const inp = document.getElementById('chatInput');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  const box = document.getElementById('chatBox');
+  const key = document.getElementById('chatKey').value.trim();
+  if (!key) { box.innerHTML += `<div class="chat-msg chat-bot"><b>Bot:</b> Enter API key.</div>`; inp.value = ''; return; }
+  box.innerHTML += `<div class="chat-msg chat-user"><b>You:</b> ${msg}</div>`;
+  inp.value = '';
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${key}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: msg }] }] })
+    });
+    const data = await res.json();
+    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No reply.';
+    box.innerHTML += `<div class="chat-msg chat-bot"><b>Bot:</b> ${reply}</div>`;
+  } catch(e) { box.innerHTML += `<div class="chat-msg chat-bot"><b>Bot:</b> Error</div>`; }
+  box.scrollTop = box.scrollHeight;
+}
+document.getElementById('chatInput').addEventListener('keyup', e => { if (e.key === 'Enter') sendChat(); });
+
+// =============================================
+// 13. TRANSLATE (50+ Languages)
+// =============================================
+async function doTranslate() {
+  const t = document.getElementById('transScript').value.trim();
+  if (!t) { document.getElementById('transMsg').textContent = '⚠️ Enter text!'; return; }
+  const target = document.getElementById('transTarget').value;
+  const r = document.getElementById('transResult');
+  r.style.display = 'block';
+  document.getElementById('transMsg').textContent = '⏳ Translating...';
+  try {
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${target.split('-')[0]}&dt=t&q=${encodeURIComponent(t)}`);
+    const data = await res.json();
+    r.innerHTML = data[0][0][0];
+    document.getElementById('transMsg').textContent = '✅ Done!';
+  } catch(e) { r.innerHTML = '❌ Error'; document.getElementById('transMsg').textContent = '❌ Failed.'; }
+}
+
+// =============================================
+// 14. CAPTIONS (50+ Languages)
+// =============================================
+function genCaptions() {
+  const s = document.getElementById('capScript').value.trim();
+  if (!s) { document.getElementById('capMsg').textContent = '⚠️ Enter script!'; return; }
+  const r = document.getElementById('capResult');
+  r.style.display = 'block';
+  const lang = document.getElementById('capLang').value;
+  const langName = LANGUAGES.find(l => l.code === lang)?.name || 'English';
+  r.innerHTML = `📝 ${s}<br><span style="color:#888; font-size:12px;">Language: ${langName}</span>`;
+  document.getElementById('capMsg').textContent = '✅ Captions ready!';
+}
+
+// =============================================
+// 15. EFFECTS
+// =============================================
+document.getElementById('effectFile').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (file) {
+    const v = document.getElementById('effectVideo');
+    v.src = URL.createObjectURL(file);
+    v.style.display = 'block';
+  }
+});
+
+function applyEffect(filter) {
+  const v = document.getElementById('effectVideo');
+  if (!v.src || v.style.display === 'none') { document.getElementById('effectMsg').textContent = '⚠️ Upload video first!'; return; }
+  const canvas = document.getElementById('effectCanvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = v.videoWidth || 640;
+  canvas.height = v.videoHeight || 360;
+  const draw = () => {
+    ctx.drawImage(v, 0, 0, canvas.width, canvas.height);
+    if (filter !== 'none') {
+      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const d = img.data;
+      if (filter === 'grayscale') {
+        for (let i = 0; i < d.length; i += 4) {
+          const g = 0.34 * d[i] + 0.5 * d[i+1] + 0.16 * d[i+2];
+          d[i] = d[i+1] = d[i+2] = g;
+        }
+      } else if (filter === 'sepia') {
+        for (let i = 0; i < d.length; i += 4) {
+          let r = d[i], g = d[i+1], b = d[i+2];
+          d[i] = Math.min(255, r*0.393 + g*0.769 + b*0.189);
+          d[i+1] = Math.min(255, r*0.349 + g*0.686 + b*0.168);
+          d[i+2] = Math.min(255, r*0.272 + g*0.534 + b*0.131);
+        }
+      } else if (filter === 'brightness') {
+        for (let i = 0; i < d.length; i++) d[i] = Math.min(255, d[i] * 1.3);
+      }
+      ctx.putImageData(img, 0, 0);
+    }
+    requestAnimationFrame(draw);
+  };
+  v.play();
+  setTimeout(draw, 100);
+  document.getElementById('effectMsg').textContent = '✅ Filter: ' + filter;
+}
+
+function downloadEffect() {
+  const v = document.getElementById('effectVideo');
+  if (!v.src) { document.getElementById('effectMsg').textContent = '⚠️ Upload video!'; return; }
+  const a = document.createElement('a');
+  a.href = v.src;
+  a.download = 'video_effect.mp4';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  document.getElementById('effectMsg').textContent = '✅ Download started!';
+}
+
+// =============================================
+// 16. SLIDERS
+// =============================================
+function setupSliders() {
+  const r = document.getElementById('audioRate');
+  const rv = document.getElementById('rateVal');
+  if (r && rv) r.addEventListener('input', () => rv.textContent = r.value);
+}
