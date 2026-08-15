@@ -160,37 +160,162 @@ function flipEditor(axis) {
   document.getElementById('editorMsg').textContent = '✅ Flipped!';
 }
 
-// ---- Text Overlay (baked into canvas) ----
-function addEditorText() {
+// ---- Text Overlay: draggable live preview, baked into canvas on Apply ----
+let editorTextStyles = { bold: false, italic: false, outline: true, shadow: false };
+let editorTextDragging = false;
+let editorTextDragOffset = { x: 0, y: 0 };
+
+function toggleEditorTextStyle(style, btn) {
+  editorTextStyles[style] = !editorTextStyles[style];
+  btn.style.background = editorTextStyles[style] ? '#d4af37' : '';
+  btn.style.color = editorTextStyles[style] ? '#111' : '';
+  updateEditorTextPreview();
+}
+
+function buildEditorFontString(size) {
+  const family = document.getElementById('editorFontFamily').value;
+  let prefix = '';
+  if (editorTextStyles.italic) prefix += 'italic ';
+  if (editorTextStyles.bold) prefix += 'bold ';
+  return `${prefix}${size}px ${family}`;
+}
+
+function getOrCreateTextPreview() {
+  let el = document.getElementById('editorTextPreview');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'editorTextPreview';
+    el.style.position = 'absolute';
+    el.style.cursor = 'grab';
+    el.style.userSelect = 'none';
+    el.style.whiteSpace = 'nowrap';
+    el.style.padding = '2px 6px';
+    document.getElementById('editorCanvasWrap').appendChild(el);
+    el.addEventListener('pointerdown', startEditorTextDrag);
+  }
+  return el;
+}
+
+function updateEditorTextPreview(forceShow) {
+  const text = document.getElementById('editorTextInput').value;
+  const msg = document.getElementById('editorMsg');
+  if (!editorImg) { if (forceShow) msg.textContent = '⚠️ Generate or upload an image first!'; return; }
+  if (!text.trim()) { cancelEditorTextPreview(); return; }
+
+  const el = getOrCreateTextPreview();
+  const color = document.getElementById('editorTextColor').value;
+  const size = parseInt(document.getElementById('editorTextSize').value, 10);
+  const family = document.getElementById('editorFontFamily').value;
+
+  el.textContent = text;
+  el.style.display = 'block';
+  el.style.color = color;
+  el.style.fontFamily = family;
+  el.style.fontSize = size + 'px';
+  el.style.fontWeight = editorTextStyles.bold ? 'bold' : 'normal';
+  el.style.fontStyle = editorTextStyles.italic ? 'italic' : 'normal';
+  el.style.textShadow = editorTextStyles.outline
+    ? '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000'
+    : (editorTextStyles.shadow ? '2px 2px 6px rgba(0,0,0,0.8)' : 'none');
+
+  // Center it the first time it appears
+  if (!el.dataset.positioned) {
+    const wrap = document.getElementById('editorCanvasWrap');
+    el.style.left = (wrap.clientWidth / 2 - el.offsetWidth / 2) + 'px';
+    el.style.top = (wrap.clientHeight / 2 - el.offsetHeight / 2) + 'px';
+    el.dataset.positioned = '1';
+  }
+}
+
+function startEditorTextDrag(e) {
+  const el = e.currentTarget;
+  editorTextDragging = true;
+  el.style.cursor = 'grabbing';
+  const rect = el.getBoundingClientRect();
+  editorTextDragOffset.x = e.clientX - rect.left;
+  editorTextDragOffset.y = e.clientY - rect.top;
+  el.setPointerCapture(e.pointerId);
+  el.addEventListener('pointermove', dragEditorText);
+  el.addEventListener('pointerup', stopEditorTextDrag);
+}
+
+function dragEditorText(e) {
+  if (!editorTextDragging) return;
+  const el = e.currentTarget;
+  const wrap = document.getElementById('editorCanvasWrap');
+  const wrapRect = wrap.getBoundingClientRect();
+  let x = e.clientX - wrapRect.left - editorTextDragOffset.x;
+  let y = e.clientY - wrapRect.top - editorTextDragOffset.y;
+  x = Math.max(0, Math.min(wrap.clientWidth - el.offsetWidth, x));
+  y = Math.max(0, Math.min(wrap.clientHeight - el.offsetHeight, y));
+  el.style.left = x + 'px';
+  el.style.top = y + 'px';
+}
+
+function stopEditorTextDrag(e) {
+  editorTextDragging = false;
+  e.currentTarget.style.cursor = 'grab';
+}
+
+function cancelEditorTextPreview() {
+  const el = document.getElementById('editorTextPreview');
+  if (el) el.remove();
+}
+
+// ---- Bake the positioned preview text permanently into the canvas ----
+function applyEditorText() {
   const msg = document.getElementById('editorMsg');
   if (!editorImg) { msg.textContent = '⚠️ Generate or upload an image first!'; return; }
   const text = document.getElementById('editorTextInput').value.trim();
   if (!text) { msg.textContent = '⚠️ Enter some text first!'; return; }
 
-  const color = document.getElementById('editorTextColor').value;
-  const size = parseInt(document.getElementById('editorTextSize').value, 10);
-  const pos = document.getElementById('editorTextPos').value;
-
+  const el = document.getElementById('editorTextPreview');
   const canvas = getEditorCanvas();
+  const wrap = document.getElementById('editorCanvasWrap');
   const ctx = canvas.getContext('2d');
 
-  ctx.font = `bold ${size}px Arial, sans-serif`;
+  const color = document.getElementById('editorTextColor').value;
+  const size = parseInt(document.getElementById('editorTextSize').value, 10);
+
+  // Map preview's on-screen position to actual canvas pixel coordinates
+  const scaleX = canvas.width / wrap.clientWidth;
+  const scaleY = canvas.height / wrap.clientHeight;
+  let previewLeft = 0, previewTop = 0, previewW = 0, previewH = 0;
+  if (el) {
+    previewLeft = parseFloat(el.style.left) || 0;
+    previewTop = parseFloat(el.style.top) || 0;
+    previewW = el.offsetWidth;
+    previewH = el.offsetHeight;
+  } else {
+    previewLeft = wrap.clientWidth / 2 - 40;
+    previewTop = wrap.clientHeight / 2 - size / 2;
+  }
+
+  const x = (previewLeft + previewW / 2) * scaleX;
+  const y = (previewTop + previewH * 0.75) * scaleY;
+  const scaledSize = size * scaleX;
+
+  ctx.font = buildEditorFontString(scaledSize);
   ctx.fillStyle = color;
-  ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-  ctx.lineWidth = Math.max(2, size / 12);
   ctx.textAlign = 'center';
 
-  let y;
-  if (pos === 'top') y = size + 20;
-  else if (pos === 'bottom') y = canvas.height - 20;
-  else y = canvas.height / 2;
-
-  const x = canvas.width / 2;
-  ctx.strokeText(text, x, y);
+  if (editorTextStyles.shadow) {
+    ctx.shadowColor = 'rgba(0,0,0,0.8)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetX = 3;
+    ctx.shadowOffsetY = 3;
+  }
+  if (editorTextStyles.outline) {
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = Math.max(2, scaledSize / 14);
+    ctx.strokeText(text, x, y);
+  }
   ctx.fillText(text, x, y);
+  ctx.shadowColor = 'transparent'; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
 
   document.getElementById('editorTextInput').value = '';
-  msg.textContent = '✅ Text added!';
+  cancelEditorTextPreview();
+  msg.textContent = '✅ Text applied!';
 }
 
 // ---- Watermark (small, semi-transparent, bottom-right — baked into canvas) ----
