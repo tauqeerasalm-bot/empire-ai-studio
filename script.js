@@ -663,3 +663,64 @@ function setupSliders() {
   if (r && rv) r.addEventListener('input', () => rv.textContent = r.value);
 }
 
+
+
+/* EMPIRE_VIDEO_EDITOR_V1 */
+(function(){
+  const $=id=>document.getElementById(id);
+  const fileInput=$("eveFileInput"), audioInput=$("eveAudioInput"), video=$("evePreview");
+  if(!fileInput || !video) return;
+  let mediaURL=null, audioURL=null, mediaFile=null, audioFile=null;
+
+  function showVideo(url){
+    video.src=url; video.style.display="block"; $("eveEmpty").style.display="none";
+    video.load();
+  }
+  function updateUI(){
+    const d=video.duration||0, t=video.currentTime||0;
+    $("eveTimeLabel").textContent=t.toFixed(2)+"s";
+    $("eveScrubber").max=d; $("eveScrubber").value=t;
+    $("eveStart").max=d; $("eveEnd").max=d;
+    if(!$("eveEnd").value || Number($("eveEnd").value)===0) $("eveEnd").value=d.toFixed(2);
+  }
+  $("eveUploadBtn").onclick=()=>fileInput.click();
+  fileInput.onchange=()=>{
+    const f=fileInput.files[0]; if(!f)return;
+    mediaFile=f;
+    if(mediaURL) URL.revokeObjectURL(mediaURL);
+    mediaURL=URL.createObjectURL(f);
+    if(f.type.startsWith("video/")) showVideo(mediaURL);
+    $("eveClip").textContent=f.name;
+  };
+  audioInput.onchange=()=>{
+    const f=audioInput.files[0]; if(!f)return;
+    audioFile=f; audioURL=URL.createObjectURL(f);
+    $("eveClip").textContent=(mediaFile?mediaFile.name+" + ":"")+f.name;
+  };
+  $("eveAddAudio").onclick=()=>audioInput.click();
+  video.onloadedmetadata=()=>updateUI();
+  video.ontimeupdate=updateUI;
+  $("eveScrubber").oninput=e=>{video.currentTime=+e.target.value};
+  $("eveSpeed").onchange=e=>video.playbackRate=+e.target.value;
+  $("eveVolume").oninput=e=>video.volume=+e.target.value;
+  $("eveSetStart").onclick=()=>{$("eveStart").value=video.currentTime.toFixed(2)};
+  $("eveSetEnd").onclick=()=>{$("eveEnd").value=video.currentTime.toFixed(2)};
+  $("eveSeekStart").onclick=()=>{video.currentTime=Number($("eveStart").value)||0};
+  $("eveAddText").onclick=()=>{$("eveTextPanel").hidden=!$("eveTextPanel").hidden};
+  $("eveApplyText").onclick=()=>{
+    const text=$("eveTextInput").value.trim(); if(!text)return;
+    let old=document.getElementById("eveOverlayText");
+    if(!old){old=document.createElement("div");old.id="eveOverlayText";old.style.cssText="position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);font-size:32px;font-weight:700;text-shadow:0 2px 6px #000;pointer-events:none;z-index:3";$("evePreview").parentElement.appendChild(old)}
+    old.textContent=text; old.style.color=$("eveTextColor").value;
+  };
+  $("eveClearBtn").onclick=()=>{
+    video.pause(); video.removeAttribute("src"); video.load(); video.style.display="none"; $("eveEmpty").style.display="";
+    $("eveClip").textContent="No media"; $("eveTextInput").value="";
+  };
+  $("eveExport").onclick=()=>{
+    // Browser-only starter export: download original media. Full trim/render export
+    // requires server-side or WebCodecs/FFmpeg.wasm rendering.
+    if(!mediaFile){alert("Please add a video first.");return}
+    const a=document.createElement("a"); a.href=mediaURL; a.download=mediaFile.name; a.click();
+  };
+})();
