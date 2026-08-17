@@ -665,8 +665,8 @@ function setupSliders() {
 
 
 
-/* EMPIRE_VIDEO_EDITOR_V1 */
-(function(){
+/* EMPIRE_VIDEO_EDITOR_V1 - DOM READY FIX */
+document.addEventListener("DOMContentLoaded", function(){
   const $=id=>document.getElementById(id);
   const fileInput=$("eveFileInput"), audioInput=$("eveAudioInput"), video=$("evePreview");
   if(!fileInput || !video) return;
@@ -723,4 +723,4 @@ function setupSliders() {
     if(!mediaFile){alert("Please add a video first.");return}
     const a=document.createElement("a"); a.href=mediaURL; a.download=mediaFile.name; a.click();
   };
-})();
+});
