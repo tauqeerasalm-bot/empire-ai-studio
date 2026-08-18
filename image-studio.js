@@ -1,0 +1,2 @@
+/* Empire Image Studio module */
+(function(){const s={file:null,filters:[],text:[]};window.EmpireImageStudio={state:s,load(f){s.file=f;return f},filter(n,v){s.filters.push({name:n,value:v})},text(t,o={}){s.text.push({text:t,...o})}}})();

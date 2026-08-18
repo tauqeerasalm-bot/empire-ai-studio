@@ -1,0 +1,2 @@
+/* Empire media utilities */
+(function(){window.EmpireMediaUtils={downloadBlob(b,n){let a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=n;a.click()},time(s){s=Math.max(0,+s||0);return String(Math.floor(s/60)).padStart(2,"0")+":"+String((s%60).toFixed(2)).padStart(5,"0")}}})();

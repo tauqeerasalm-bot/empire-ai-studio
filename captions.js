@@ -1,0 +1,2 @@
+/* Empire Captions module */
+(function(){window.EmpireCaptions={parseSRT(t){return t.trim().split(/\n\s*\n/).map(b=>{let l=b.split(/\r?\n/),i=l.findIndex(x=>x.includes("-->")),p=(l[i]||"").split("-->");return{start:(p[0]||"").trim(),end:(p[1]||"").trim(),text:l.slice(i+1).join("\n")}}).filter(x=>x.start&&x.end)},formatSRT(a){return a.map((x,i)=>`${i+1}\n${x.start} --> ${x.end}\n${x.text}\n`).join("\n")}}})();

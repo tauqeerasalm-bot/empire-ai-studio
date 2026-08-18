@@ -1,0 +1,2 @@
+/* Empire local project store */
+(function(){const k="empire-projects-v1",read=()=>{try{return JSON.parse(localStorage.getItem(k)||"[]")}catch{return[]}};window.EmpireProjects={all:read,save(p){let a=read(),x={id:p.id||Date.now().toString(),updatedAt:new Date().toISOString(),...p},i=a.findIndex(y=>y.id===x.id);i<0?a.push(x):a[i]=x;localStorage.setItem(k,JSON.stringify(a));return x},remove(id){localStorage.setItem(k,JSON.stringify(read().filter(x=>x.id!==id)))}}})();

@@ -1,0 +1,1 @@
+/* Empire AI Studio module registry */ window.EmpireModules={version:"1.0.0",files:["video-editor.js","audio-studio.js","image-studio.js","timeline.js","captions.js","templates.js","ai-tools.js","media-utils.js","social-export.js","project-store.js"]};

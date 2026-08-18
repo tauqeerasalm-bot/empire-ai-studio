@@ -1,0 +1,2 @@
+/* Empire AI adapter - no key included */
+(function(){const api={endpoint:"",setEndpoint(u){api.endpoint=u},async request(task,payload={}){if(!api.endpoint)throw Error("AI backend endpoint is not configured");let r=await fetch(api.endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({task,payload})});if(!r.ok)throw Error("AI request failed");return r.json()}};for(const n of ["textToImage","imageToImage","textToVideo","imageToVideo","textToSpeech","speechToText","translate","captions"])api[n]=p=>api.request(n,p);window.EmpireAITools=api})();

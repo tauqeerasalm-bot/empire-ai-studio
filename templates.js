@@ -1,0 +1,2 @@
+/* Empire templates */
+(function(){const a=[{id:"tiktok",name:"TikTok",ratio:"9:16",duration:30},{id:"youtube",name:"YouTube",ratio:"16:9",duration:60},{id:"square",name:"Square",ratio:"1:1",duration:30}];window.EmpireTemplates={all:()=>a.slice(),get:id=>a.find(x=>x.id===id)}})();

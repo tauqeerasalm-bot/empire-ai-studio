@@ -1,0 +1,2 @@
+/* Empire Timeline core */
+(function(){const s={tracks:[],time:0,duration:0};window.EmpireTimeline={state:s,addTrack(type="media"){const t={id:String(Date.now()+Math.random()),type,clips:[]};s.tracks.push(t);return t},addClip(id,c){const t=s.tracks.find(x=>x.id===id);if(!t)throw Error("Track not found");t.clips.push(c);return c},seek(t){s.time=Math.max(0,+t||0)},duration(d){s.duration=Math.max(0,+d||0)}}})();

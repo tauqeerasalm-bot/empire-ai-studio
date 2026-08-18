@@ -1,0 +1,2 @@
+/* Empire Audio Studio module */
+(function(){const s={files:[],volume:1,speed:1};window.EmpireAudioStudio={state:s,addFile(f){if(f)s.files.push(f);return f},remove(i){return s.files.splice(i,1)[0]},volume(v){s.volume=Math.max(0,Math.min(1,+v||0))},speed(v){s.speed=Math.max(.25,Math.min(4,+v||1))}}})();
