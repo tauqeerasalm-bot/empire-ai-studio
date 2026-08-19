@@ -1,0 +1,1 @@
+Video Editor V2: upload, preview, play/pause, seek, trim marker, split marker, speed, volume, text overlay, filters, audio selection, timeline UI, inspector, mobile responsive. No API key. MP4 rendering requires a later rendering engine.
